@@ -11,7 +11,7 @@ import axios from 'axios';
 
 export default {
   getSheets (cb) {
-    axios.get('http://localhost:8888/')
+    axios.get('/sheets')
         .then(response => {
              cb(response.data)
         })

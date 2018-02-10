@@ -5,13 +5,10 @@ A simple PDF viewer to organize music sheets.
 ## Build Setup
 
 ``` bash
-# build frontend
-cd frontend
-npm install
-npm run dev &
-
-cd ../backend
-python web.py
+sudo docker build . -t music
+cp start.example.sh start.sh
+nano start.sh
+./start
 ```
 
 <img src="./img/digitalmusicstand_001.jpg" />

@@ -21,7 +21,8 @@ export default {
       console.log(+this.active_sheet.pages);
       var data = []
       for (var i = 1; i < (+this.active_sheet.pages) + 1; i++) {
-        data.push({url: 'http://localhost:8888/page/' + i + '/' + this.active_sheet.file})
+        // data.push({url: 'http://localhost:8888/page/' + i + '/' + this.active_sheet.file})
+        data.push({url: '/page/' + i + '/' + this.active_sheet.file})
       }
       return data;
     },
