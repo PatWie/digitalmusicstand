@@ -15,6 +15,7 @@ RUN pip install tornado
 ADD ./frontend /app/frontend
 WORKDIR /app/frontend
 RUN echo "hi"
+RUN npm install chalk
 RUN npm run build
 RUN dir /app/frontend/dist
 
