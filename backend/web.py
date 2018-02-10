@@ -45,8 +45,8 @@ class SheetListHandler(tornado.web.RequestHandler):
             infp, err = proc.communicate()
 
 
-            title = pdf[len('sheets/'):].split('_')[1][:-4].replace('-', ' ')
-            author = pdf[len('sheets/'):].split('_')[0].replace('-', ' ')
+            title = pdf.split('/')[-1].split('_')[1][:-4].replace('-', ' ')
+            author = pdf.split('/')[-1].split('_')[0].replace('-', ' ')
             data.append({
                 'title': titlecase(title),
                 'author': titlecase(author),
