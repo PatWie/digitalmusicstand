@@ -2,14 +2,20 @@
 
 A simple PDF viewer to organize music sheets.
 
+<img src="./img/digitalmusicstand_001.jpg" />
+<img src="./img/digitalmusicstand_002.jpg" />
+
 ## Build Setup
 
+You only need to set two options:
+ - SHEET_DIR: path to pdf files
+ - PORT: port the app is listen to
+
+The files in the sheet directoy need to follow the convention `interpret_title.pdf`. Whitespaces should be replaced by '-'.
+
 ``` bash
-sudo docker build . -t music
+sudo docker build . -t digitalmusicstand
 cp start.example.sh start.sh
 nano start.sh
 ./start
 ```
-
-<img src="./img/digitalmusicstand_001.jpg" />
-<img src="./img/digitalmusicstand_002.jpg" />
