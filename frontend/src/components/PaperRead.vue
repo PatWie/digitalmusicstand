@@ -70,7 +70,7 @@ export default {
   div.papis-pdf{
     background-color: #171A1C;
     height:100%;
-    width:95%;
+    // width:95%;
     white-space: nowrap; /*Prevents Wrapping*/
     overflow-x: scroll;
     overflow-y: hidden;
