@@ -5,6 +5,16 @@ A simple PDF viewer to organize music sheets.
 <img src="./img/digitalmusicstand_001.jpg" />
 <img src="./img/digitalmusicstand_002.jpg" />
 
+## Demo
+
+visit [http://demo-digitalmusicstand.patwie.com](http://demo-digitalmusicstand.patwie.com)
+
+## Get
+
+```bash
+docker pull patwie/digitalmusicstand
+```
+
 ## Build Setup
 
 You only need to set two options:
