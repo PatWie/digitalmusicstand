@@ -52,6 +52,7 @@ class SheetListHandler(tornado.web.RequestHandler):
                 'author': titlecase(author),
                 'file':pdf,
                 'preview': '/preview/%s' % pdf,
+                # 'preview': 'http://localhost:8888/preview/%s' % pdf,
                 'pages': re.findall(regex, infp)[0]
                 })
 

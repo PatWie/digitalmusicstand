@@ -19,3 +19,7 @@ cp start.example.sh start.sh
 nano start.sh
 ./start
 ```
+
+## Features
+- no database just a collection of files
+- supports usb double foot switch to "flip" pages (shortcuts: 1 (left), 2 (right))

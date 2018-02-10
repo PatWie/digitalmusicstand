@@ -7,6 +7,8 @@ import underscore from 'vue-underscore';
 
 Vue.use(underscore);
 Vue.config.productionTip = false
+Vue.use(require('vue-shortkey'))
+
 
 /* eslint-disable no-new */
 new Vue({

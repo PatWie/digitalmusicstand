@@ -1,12 +1,15 @@
 <template>
- <div class="papis-pdf" v-if="show_list === false">
+ <div
+ v-shortkey="{left: [1], right: ['2']}" @shortkey="scroll_horizontal"
+ class="papis-pdf" v-if="show_list === false">
 
-    <img :src="page.url" v-for="page in pages"/>
+    <img class="score" :src="page.url" v-for="page in pages"/>
 
  </div>
 </template>
 
 <script>
+window.$ = window.jQuery = require('jquery');
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
@@ -21,8 +24,8 @@ export default {
       console.log(+this.active_sheet.pages);
       var data = []
       for (var i = 1; i < (+this.active_sheet.pages) + 1; i++) {
-        // data.push({url: 'http://localhost:8888/page/' + i + '/' + this.active_sheet.file})
-        data.push({url: '/page/' + i + '/' + this.active_sheet.file})
+        data.push({url: 'http://localhost:8888/page/' + i + '/' + this.active_sheet.file})
+        // data.push({url: '/page/' + i + '/' + this.active_sheet.file})
       }
       return data;
     },
@@ -38,10 +41,27 @@ export default {
   methods : {
     randomNumber : function(){
       return Math.random();
+    },
+  scroll_horizontal: function(event) {
+    switch(event.srcKey){
+      case "left":
+        var w = $(".score").first().get(0).width;
+        $( ".papis-pdf" ).scrollLeft( $( ".papis-pdf" ).scrollLeft() - w );
+        break;
+      case "right":
+        var w = $(".score").first().get(0).width;
+        $( ".papis-pdf" ).scrollLeft( $( ".papis-pdf" ).scrollLeft() + w );
+        break;
     }
   }
+}
+
 
 }
+
+
+
+
 </script>
 
 <style scoped>
