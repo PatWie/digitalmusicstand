@@ -24,7 +24,8 @@ You only need to set two options:
 The files in the sheet directoy need to follow the convention `interpret_title.pdf`. Whitespaces should be replaced by '-'.
 
 ``` bash
-sudo docker build . -t digitalmusicstand
+sudo docker build . -f dependencies.Dockerfile -t patwie/digitalmusicstand_dependencies
+sudo docker build . -t patwie/digitalmusicstand --no-cache
 cp start.example.sh start.sh
 nano start.sh
 ./start

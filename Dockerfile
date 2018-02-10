@@ -1,15 +1,15 @@
-FROM beevelop/nodejs:6
+FROM patwie/digitalmusicstand_dependencies
 MAINTAINER Patrick Wieschollek <mail@patwie.com>
 
-# Install Python.
-RUN \
-  apt-get update && \
-  apt-get install -y python python-dev python-pip python-virtualenv poppler-utils&& \
-  rm -rf /var/lib/apt/lists/*
+# # Install Python.
+# RUN \
+#   apt-get update && \
+#   apt-get install -y python python-dev python-pip python-virtualenv poppler-utils&& \
+#   rm -rf /var/lib/apt/lists/*
 
-RUN pip install --upgrade pip
-RUN pip install titlecase
-RUN pip install tornado
+# RUN pip install --upgrade pip
+# RUN pip install titlecase
+# RUN pip install tornado
 
 
 ADD ./frontend /app/frontend
