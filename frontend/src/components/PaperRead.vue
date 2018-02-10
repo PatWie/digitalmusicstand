@@ -46,11 +46,13 @@ export default {
     switch(event.srcKey){
       case "left":
         var w = $(".score").first().get(0).width;
-        $( ".papis-pdf" ).scrollLeft( $( ".papis-pdf" ).scrollLeft() - w );
+        $(".papis-pdf").animate( { scrollLeft: '-=' + w }, 1000);
+        // $( ".papis-pdf" ).scrollLeft( $( ".papis-pdf" ).scrollLeft() - w );
         break;
       case "right":
         var w = $(".score").first().get(0).width;
-        $( ".papis-pdf" ).scrollLeft( $( ".papis-pdf" ).scrollLeft() + w );
+        $(".papis-pdf").animate( { scrollLeft: '+=' + w }, 1000);
+        // $( ".papis-pdf" ).scrollLeft( $( ".papis-pdf" ).scrollLeft() + w );
         break;
     }
   }
