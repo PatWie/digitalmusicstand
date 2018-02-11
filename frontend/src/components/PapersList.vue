@@ -43,7 +43,7 @@ export default {
 
     sorted(arr) {
       return arr.filter(e => {
-        return e.title.indexOf(this.filter_query) !== -1;
+        return e.title.toLowerCase().indexOf(this.filter_query.toLowerCase()) !== -1;
       })
 
     }
