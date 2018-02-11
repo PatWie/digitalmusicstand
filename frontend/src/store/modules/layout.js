@@ -15,11 +15,6 @@ const getters = {
 
 
 const actions = {
-  getAllSheets ({ commit }) {
-    sheetserver.getSheets(sheets => {
-      commit('setSheets', sheets)
-    })
-  },
 
   toggleShowList ({ state, commit } ) {
     commit('toggleShowList')

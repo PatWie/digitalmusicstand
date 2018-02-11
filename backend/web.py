@@ -23,6 +23,7 @@ class PreviewHandler(tornado.web.RequestHandler):
         data, err = proc.communicate()
         self.write(data)
 
+
 class PageHandler(tornado.web.RequestHandler):
     def get(self, p, q):
         self.set_header("Content-type", "image/png")
@@ -40,24 +41,45 @@ class SheetListHandler(tornado.web.RequestHandler):
 
         data = []
         for pdf in pdfs:
-            args = ["pdfinfo", pdf]
-            proc = Popen(args, stdout=PIPE, stderr=PIPE)
-            infp, err = proc.communicate()
+            try:
+                # try to used compressed file
+                if os.path.isfile(pdf[:-4] + ".cpdf"):
+                    pdf = pdf[:-4] + ".cpdf"
 
+                args = ["pdfinfo", pdf]
+                proc = Popen(args, stdout=PIPE, stderr=PIPE)
+                infp, err = proc.communicate()
 
-            title = pdf.split('/')[-1].split('_')[1][:-4].replace('-', ' ')
-            author = pdf.split('/')[-1].split('_')[0].replace('-', ' ')
-            data.append({
-                'title': titlecase(title),
-                'author': titlecase(author),
-                'file':pdf,
-                'preview': '/preview/%s' % pdf,
-                # 'preview': 'http://localhost:8888/preview/%s' % pdf,
-                'pages': re.findall(regex, infp)[0]
-                })
+                # title_interpret:transcriber_version.pdf
+
+                basename = pdf.split('/')[-1]
+                basename_parts = basename.replace('.pdf', '').replace('.cpdf', '').split('_')
+
+                title = basename_parts[1].replace('-', ' ')
+
+                transcriber = ""
+                author = basename_parts[0].replace('-', ' ')
+
+                if len(author.split(":")) > 1:
+                    transcriber = author.split(":")[1]
+                    author = author.split(":")[0]
+
+                version = ""
+                if len(basename_parts) == 3:
+                    version = basename_parts[2]
+                data.append({
+                    'title': titlecase(title),
+                    'author': titlecase(author),
+                    'transcriber': titlecase(transcriber),
+                    'file': pdf,
+                    'version': version,
+                    'preview': '/preview/%s' % pdf,
+                    'pages': re.findall(regex, infp)[0]})
+            except Exception as e:
+                print("cannot read %s" % pdf)
+                print(e)
 
         self.write(json.dumps(data))
-
 
 
 class Application(tornado.web.Application):
@@ -80,7 +102,9 @@ if __name__ == '__main__':
         (r'/sheets', SheetListHandler),
         (r'/preview/(.*)', PreviewHandler),
         (r'/page/([0-9]*)/(.*)', PageHandler),
-        (r"/(.*)", tornado.web.StaticFileHandler, {"path": args.root, "default_filename": os.path.join(args.root, 'index.html')})
+        (r"/(.*)", tornado.web.StaticFileHandler, {
+            "path": args.root,
+            "default_filename": os.path.join(args.root, 'index.html')})
     ])
 
     print("listen on %s:%i ..." % (args.address, args.port))

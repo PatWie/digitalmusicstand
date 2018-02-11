@@ -1,5 +1,5 @@
 <template>
- <div class="papis-details" v-if="show_list === true">
+ <div class="papis-details" v-if="show_list === true && active_sheet">
      <article>
          <h1>{{active_sheet.title}}</h1>
          <p class="authors">{{active_sheet.author}}</p>

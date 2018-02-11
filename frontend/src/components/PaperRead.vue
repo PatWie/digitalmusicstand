@@ -24,7 +24,6 @@ export default {
       console.log(+this.active_sheet.pages);
       var data = []
       for (var i = 1; i < (+this.active_sheet.pages) + 1; i++) {
-        // data.push({url: 'http://localhost:8888/page/' + i + '/' + this.active_sheet.file})
         data.push({url: '/page/' + i + '/' + this.active_sheet.file})
       }
       return data;
@@ -43,15 +42,26 @@ export default {
       return Math.random();
     },
   scroll_horizontal: function(event) {
+    var page_width = $(".score").first().get(0).width;
+    var current_scroll = $(".papis-pdf").scrollLeft();
+    var current_page = Math.round(current_scroll / page_width);
+
     switch(event.srcKey){
       case "left":
-        var w = $(".score").first().get(0).width;
-        $(".papis-pdf").animate( { scrollLeft: '-=' + w }, 1000);
+        current_page = current_page - 1;
+        var new_scroll = current_page * page_width;
+        $(".papis-pdf").animate( { scrollLeft: '-=' + (current_scroll - new_scroll) }, {duration: 1000}); // easing: "easeInOutSine"
+
+        // $(".papis-pdf").animate( { scrollLeft: '-=' + w }, 1000);
         // $( ".papis-pdf" ).scrollLeft( $( ".papis-pdf" ).scrollLeft() - w );
         break;
       case "right":
-        var w = $(".score").first().get(0).width;
-        $(".papis-pdf").animate( { scrollLeft: '+=' + w }, 1000);
+        current_page = current_page + 1;
+        var new_scroll = current_page * page_width;
+
+
+        $(".papis-pdf").animate( { scrollLeft: '+=' + (new_scroll - current_scroll) }, {duration: 1000}); // easing: "easeInOutSine"
+        // $(".papis-pdf").animate( { scrollLeft: '+=' + w }, 1000);
         // $( ".papis-pdf" ).scrollLeft( $( ".papis-pdf" ).scrollLeft() + w );
         break;
     }

@@ -12,7 +12,9 @@
           </div>
           <div class="searchbar">
               <i class="material-icons">search</i>
-              <input type="text" name="Search" class="searchtext z-depth-2" placeholder="Explore Sheets" style="">
+              <input type="text" name="Search" class="searchtext z-depth-2"
+              v-model="filter_query"
+              placeholder="Explore Sheets" style="">
           </div>
           <div class="col l7">
               <ul class="right">
@@ -31,7 +33,21 @@
 export default {
   name: 'NavBar',
 
-
+  computed: {
+    filter_query: {
+        get () {
+          console.log('get', this.$store.state.filter_query)
+          return this.$store.state.filter_query
+        },
+        set (value) {
+          console.log('set', value)
+          this.$store.dispatch('setFilterQuery', value);
+          // console.log(value)
+          // this.$store.dispatch('getAllSheets')
+          // this.$store.commit('setFilterQuery', value)
+        }
+      }
+  },
 
   data () {
     return {
