@@ -8,6 +8,9 @@ Usage is similar to Sublime. Press `P` and perform a fuzzy search.
 
 ## Get
 
+Download from the [release page](https://github.com/PatWie/digitalmusicstand/releases). THe single binary contains all files.
+Or build it yourself:
+
 ```bash
 git clone https://github.com/PatWie/digitalmusicstand.git
 cd digitalmusicstand

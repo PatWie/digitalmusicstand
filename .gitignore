@@ -1,3 +1,4 @@
 sheets/*
 !sheets/.keep
 /digitalmusicstand
+*-packr.go
