@@ -1,1 +1,0 @@
-python /app/web.py -p 8888 -r /app/frontend/dist -s /app/data

@@ -2,35 +2,25 @@
 
 A simple PDF viewer to organize music sheets.
 
-<img src="./img/digitalmusicstand_001.jpg" />
-<img src="./img/digitalmusicstand_002.jpg" />
+<img src="./.github/digitalmusicstand_001.jpg" />
 
-## Demo
-
-visit [http://demo-digitalmusicstand.patwie.com](http://demo-digitalmusicstand.patwie.com)
+Usage is similar to Sublime. Press `P` and perform a fuzzy search.
 
 ## Get
 
 ```bash
-docker pull patwie/digitalmusicstand
+git clone https://github.com/PatWie/digitalmusicstand.git
+cd digitalmusicstand
+go build
 ```
 
-## Build Setup
+## Usage
 
-You only need to set two options:
- - SHEET_DIR: path to pdf files
- - PORT: port the app is listen to
+```bash
+./digitalmusicstand --sheets /path/to/pdfs --port 3000
+```
 
 The files in the sheet directoy need to follow the convention `interpret_title.pdf`. Whitespaces should be replaced by '-'.
 
-``` bash
-sudo docker build . -f dependencies.Dockerfile -t patwie/digitalmusicstand_dependencies
-sudo docker build . -t patwie/digitalmusicstand --no-cache
-cp start.example.sh start.sh
-nano start.sh
-./start
-```
+Point your browser to `http://localhost:3000`
 
-## Features
-- no database just a collection of files
-- supports usb double foot switch to "flip" pages (shortcuts: 1 (left), 2 (right))
