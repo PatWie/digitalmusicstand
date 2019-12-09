@@ -47,8 +47,8 @@ func main() {
   }
 
   for _, match := range matches {
-    url := "/" + match
     match = strings.ReplaceAll(match, (*sheet_dir)+"/", "")
+    url := "/sheets/" + match
     match = strings.ReplaceAll(match, ".pdf", "")
     match = strings.ReplaceAll(match, "-", " ")
 
@@ -62,7 +62,7 @@ func main() {
   }
 
   r.Use(static.Serve("/", static.LocalFile("static", false)))
-  r.Use(static.Serve("/sheets", static.LocalFile("sheets", false)))
+  r.Use(static.Serve("/sheets", static.LocalFile(*sheet_dir, false)))
   r.GET("/sheets.json", func(c *gin.Context) {
     c.JSON(200, sheets)
   })
