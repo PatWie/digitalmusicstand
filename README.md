@@ -8,7 +8,7 @@ Usage is similar to Sublime. Press `P` and perform a fuzzy search.
 
 ## Get
 
-Download from the [release page](https://github.com/PatWie/digitalmusicstand/releases). THe single binary contains all files.
+Download from the [release page](https://github.com/PatWie/digitalmusicstand/releases). The single binary contains all files.
 Or build it yourself:
 
 ```bash

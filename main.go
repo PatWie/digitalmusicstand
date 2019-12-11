@@ -6,7 +6,6 @@ import (
   "log"
   "net/http"
   "os"
-  "path/filepath"
   "strings"
 
   "github.com/akamensky/argparse"
@@ -48,11 +47,6 @@ func main() {
     log.Fatal(parser.Usage(err))
   }
 
-  workDir, err := os.Getwd()
-  if err != nil {
-    log.Fatal(parser.Usage(err))
-  }
-
   r := chi.NewRouter()
   r.Get("/sheets.json", func(w http.ResponseWriter, r *http.Request) {
     sheets, err := GetSheets(*sheet_dir)
@@ -63,8 +57,8 @@ func main() {
 
   })
 
-  FileServer(r, "/", http.Dir(filepath.Join(workDir, "static")))
-  FileServer(r, "/sheets", http.Dir(filepath.Join(workDir, "sheets")))
+  FileServer(r, "/", box)
+  FileServer(r, "/sheets", http.Dir(*sheet_dir))
 
   http.ListenAndServe(fmt.Sprintf(":%v", *port), r)
 }
