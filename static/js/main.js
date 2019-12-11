@@ -2,26 +2,31 @@ var thePdf = null;
 var result_id = 0;
 var result_len = 0;
 
-var page_pos = 0;
+var current_page = 0;
 var num_pages = 0;
+var page_width = 0;
 
 var old_q = '';
 
-function scroll2page(page) {
+function scroll2page(target_page) {
 
-    if (num_pages > 0 && $("canvas").eq(page) !== undefined) {
-        if (page_pos >= 0) {
-            if (page_pos < num_pages) {
+    if (num_pages > 0 && $("canvas").eq(target_page) !== undefined) {
+        if (target_page >= 0) {
+            if (target_page < num_pages) {
                 var container = $("body")
+                var target = $("canvas").eq(target_page)
 
-                var offset = $("canvas").eq(page).offset().left - container.offset().left;
+                current_page = target_page;
+
+                // var offset = target.position().left - container.position().left;
+                var offset = container.position().left + target_page * (page_width + 2)
+                    // container.scrollLeft();
+
                 container.animate({
                     scrollLeft: offset
-                }, {
-                    duration: 1000
-                });
+                }, 1000);
 
-                page_pos = page;
+
             }
         }
     }
@@ -48,8 +53,10 @@ function renderPDF(url) {
     });
 
     $("body").scrollLeft(0);
-    page_pos = 0;
+    current_page = 0;
     $('#intro').css('visibility', 'hidden');
+
+
 }
 
 function renderPage(pageNumber, canvas) {
@@ -67,6 +74,7 @@ function renderPage(pageNumber, canvas) {
             canvasContext: canvas.getContext('2d'),
             viewport: viewport
         });
+        page_width = canvas.width;
     });
 }
 
@@ -88,6 +96,17 @@ function selectNthEnty(n) {
     }
 }
 
+function showQueryBar(e) {
+
+    if ($('#prompt').css('visibility') === 'hidden') {
+        e.preventDefault();
+
+        $('#prompt').css('visibility', 'visible');
+        $('#query').focus();
+        $('#query').select();
+    }
+}
+
 $(function() {
 
     let objects = []
@@ -100,6 +119,11 @@ $(function() {
     function score(a) {
         return (a[0] ? a[0].score : -1000000) + (a[1] ? a[1].score : -100000000);
     }
+
+    // $('#search_btn').click(function(e) {
+    //     e.preventDefault();
+    //     showQueryBar(e)
+    // });
 
     $("#query").keyup(function() {
         let q = $("#query").val();
@@ -141,16 +165,16 @@ $(function() {
 
 
     $(document).on('keyup', function(e) {
-        console.log(e.which)
+        // console.log(e.which)
 
         if (e.which == 49) { // e.which == 37 ||
             e.preventDefault();
-            scroll2page(page_pos - 1)
+            scroll2page(current_page - 1)
         }
 
         if (e.which == 50) { // e.which == 39 ||
             e.preventDefault();
-            scroll2page(page_pos + 1)
+            scroll2page(current_page + 1)
         }
 
         if (e.which == 40) {
@@ -180,18 +204,34 @@ $(function() {
             }
         }
         if (e.key == 'p') {
-            if ($('#prompt').css('visibility') === 'hidden') {
-                e.preventDefault();
-
-                $('#prompt').css('visibility', 'visible');
-                $('#query').focus();
-                $('#query').select();
-            }
-
+            showQueryBar(e);
         }
     });
     $("#prompt").click(function(e) {
         e.stopPropagation();
+    });
+
+    $("#search_btn").click(function(e) {
+        e.stopPropagation();
+        showQueryBar(e)
+    });
+
+    $("#left_btn").click(function(e) {
+        e.stopPropagation();
+        scroll2page(current_page - 1)
+    });
+
+    $("#right_btn").click(function(e) {
+        e.stopPropagation();
+        scroll2page(current_page + 1)
+    });
+
+    $("#refresh_btn").click(function(e) {
+        e.stopPropagation();
+        $.getJSON("/sheets.json", function(data) {
+            objects = data;
+            result_len = data.length;
+        });
     });
 
     $('html').click(function() {
