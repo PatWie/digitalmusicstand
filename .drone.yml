@@ -1,0 +1,86 @@
+---
+kind: pipeline
+type: docker
+name: linux
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: pack
+  image: golang:1.13
+  commands:
+  - go get -u github.com/gobuffalo/packr/v2/packr2
+  - /go/bin/packr2
+
+- name: build-linux-amd64
+  image: golang:1.13
+  commands:
+  - dir
+  - go build
+  - mv digitalmusicstand digitalmusicstand-linux-amd64
+  environment:
+    GOARCH: amd64
+    GOOS: linux
+
+- name: build-linux-arm64
+  image: golang:1.13
+  commands:
+  - dir
+  - go build
+  - mv digitalmusicstand digitalmusicstand-linux-arm64
+  environment:
+    GOARCH: arm64
+    GOOS: linux
+
+- name: build-linux-arm
+  image: golang:1.13
+  commands:
+  - dir
+  - go build
+  - mv digitalmusicstand digitalmusicstand-linux-arm
+  environment:
+    GOARCH: arm
+    GOOS: linux
+
+- name: build-windows-amd64
+  image: golang:1.13
+  commands:
+  - dir
+  - go build
+  - mv digitalmusicstand.exe digitalmusicstand-windows-amd64.exe
+  environment:
+    GOARCH: amd64
+    GOOS: windows
+
+- name: create_release
+  image: patwie/tar:latest
+  commands:
+  - zip -rv digitalmusicstand.zip README.md digitalmusicstand-windows-amd64.exe
+  - tar -czvf digitalmusicstand-linux-amd64.tar.gz README.md  digitalmusicstand-linux-amd64
+  - tar -czvf digitalmusicstand-linux-arm.tar.gz README.md  digitalmusicstand-linux-arm
+  - tar -czvf digitalmusicstand-linux-arm64.tar.gz README.md  digitalmusicstand-linux-arm64
+
+- name: upload_release
+  image: plugins/github-release
+  settings:
+    api_key:
+      from_secret: github_token
+    checksum:
+    - md5
+    - sha256
+    files:
+    - digitalmusicstand.zip
+    - digitalmusicstand-linux-amd64.tar.gz
+    - digitalmusicstand-linux-arm64.tar.gz
+    - digitalmusicstand-linux-arm.tar.gz
+  when:
+    event:
+    - tag
+
+---
+kind: signature
+hmac: fe7c4fe880b28e7c334328a182ae43e3663282216310736cf45511c4e0944a6d
+
+...

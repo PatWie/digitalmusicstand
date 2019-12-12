@@ -1,0 +1,87 @@
+def main():
+  return [
+      pipeline()
+  ]
+
+
+def pack():
+  return {
+      'name': 'pack',
+      'image': 'golang:1.13',
+      'commands': [
+          'go get -u github.com/gobuffalo/packr/v2/packr2',
+              '/go/bin/packr2',
+      ]
+  }
+
+
+def build_step(os, arch):
+  commands = [
+      'dir',
+      'go build'
+  ]
+  if os == 'windows':
+    commands = commands + \
+        ['mv digitalmusicstand.exe digitalmusicstand-' + os + '-' + arch + '.exe']
+  else:
+    commands = commands + \
+        ['mv digitalmusicstand digitalmusicstand-' + os + '-' + arch]
+
+  return {
+      'name': 'build-' + os + '-' + arch,
+      'image': 'golang:1.13',
+      'commands': commands,
+      'environment': {
+          'GOOS': os,
+          'GOARCH': arch,
+      }
+  }
+
+
+def create_release():
+  return {
+      'name': 'create_release',
+      'image': 'patwie/tar:latest',
+      'commands': [
+          'zip -rv digitalmusicstand.zip README.md digitalmusicstand-windows-amd64.exe',
+          'tar -czvf digitalmusicstand-linux-amd64.tar.gz README.md  digitalmusicstand-linux-amd64',
+          'tar -czvf digitalmusicstand-linux-arm.tar.gz README.md  digitalmusicstand-linux-arm',
+          'tar -czvf digitalmusicstand-linux-arm64.tar.gz README.md  digitalmusicstand-linux-arm64'
+      ],
+
+  }
+
+
+def upload_release():
+  return {
+      'name': 'upload_release',
+      'image': 'plugins/github-release',
+      'settings': {
+          'api_key': {'from_secret': 'github_token'},
+          'files': [
+              'digitalmusicstand.zip',
+              'digitalmusicstand-linux-amd64.tar.gz',
+              'digitalmusicstand-linux-arm64.tar.gz',
+              'digitalmusicstand-linux-arm.tar.gz',
+          ],
+          'checksum': ['md5', 'sha256'],
+      },
+      'when': {'event': 'tag'}
+  }
+
+
+def pipeline():
+  return {
+      'kind': 'pipeline',
+      'type': 'docker',
+      'name': 'linux',
+      'steps': [
+          pack(),
+          build_step('linux', 'amd64'),
+          build_step('linux', 'arm64'),
+          build_step('linux', 'arm'),
+          build_step('windows', 'amd64'),
+          create_release(),
+          upload_release()
+      ]
+  }

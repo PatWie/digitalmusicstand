@@ -1,6 +1,8 @@
 # Digital Music Stand
 
-A simple PDF viewer to organize music sheets.
+[![Build Status](https://ci.patwie.com/api/badges/PatWie/digitalmusicstand/status.svg)](https://ci.patwie.com/PatWie/digitalmusicstand)
+
+A simple cross-platform PDF viewer to organize music sheets.
 
 <img src="./.github/digitalmusicstand_001.jpg" />
 
