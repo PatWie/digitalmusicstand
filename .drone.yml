@@ -57,7 +57,7 @@ steps:
 - name: create_release
   image: patwie/tar:latest
   commands:
-  - zip -rv digitalmusicstand.zip README.md digitalmusicstand-windows-amd64.exe
+  - zip -rv digitalmusicstand-windows-amd64.zip README.md digitalmusicstand-windows-amd64.exe
   - tar -czvf digitalmusicstand-linux-amd64.tar.gz README.md  digitalmusicstand-linux-amd64
   - tar -czvf digitalmusicstand-linux-arm.tar.gz README.md  digitalmusicstand-linux-arm
   - tar -czvf digitalmusicstand-linux-arm64.tar.gz README.md  digitalmusicstand-linux-arm64
@@ -71,16 +71,12 @@ steps:
     - md5
     - sha256
     files:
-    - digitalmusicstand.zip
+    - digitalmusicstand-windows-amd64.zip
     - digitalmusicstand-linux-amd64.tar.gz
     - digitalmusicstand-linux-arm64.tar.gz
     - digitalmusicstand-linux-arm.tar.gz
   when:
     event:
     - tag
-
----
-kind: signature
-hmac: fe7c4fe880b28e7c334328a182ae43e3663282216310736cf45511c4e0944a6d
 
 ...

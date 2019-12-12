@@ -43,7 +43,7 @@ def create_release():
       'name': 'create_release',
       'image': 'patwie/tar:latest',
       'commands': [
-          'zip -rv digitalmusicstand.zip README.md digitalmusicstand-windows-amd64.exe',
+          'zip -rv digitalmusicstand-windows-amd64.zip README.md digitalmusicstand-windows-amd64.exe',
           'tar -czvf digitalmusicstand-linux-amd64.tar.gz README.md  digitalmusicstand-linux-amd64',
           'tar -czvf digitalmusicstand-linux-arm.tar.gz README.md  digitalmusicstand-linux-arm',
           'tar -czvf digitalmusicstand-linux-arm64.tar.gz README.md  digitalmusicstand-linux-arm64'
@@ -59,7 +59,7 @@ def upload_release():
       'settings': {
           'api_key': {'from_secret': 'github_token'},
           'files': [
-              'digitalmusicstand.zip',
+              'digitalmusicstand-windows-amd64.zip',
               'digitalmusicstand-linux-amd64.tar.gz',
               'digitalmusicstand-linux-arm64.tar.gz',
               'digitalmusicstand-linux-arm.tar.gz',
