@@ -39,7 +39,7 @@ func main() {
 	parser := argparse.NewParser("dm", "Digital Music Stand (https://github.com/PatWie/digitalmusicstand)")
 	sheet_dir := parser.String("s", "sheets", &argparse.Options{Required: false, Help: "Path to sheets", Default: "sheets"})
 	port := parser.Int("p", "port", &argparse.Options{Required: false, Help: "Port to serve", Default: 3000})
-	compress := parser.Flag("c", "compress", &argparse.Options{Required: false, Help: "Try to compress PDF files", Default: true})
+	compress := parser.Flag("c", "compress", &argparse.Options{Required: false, Help: "Try to compress PDF files", Default: false})
 
 	err := parser.Parse(os.Args)
 	if err != nil {
@@ -57,9 +57,12 @@ func main() {
 
 	})
 
-	sheetDir := SheetDir{Compress: *compress, Dir: *sheet_dir}
 	FileServer(r, "/", box)
-	FileServer(r, "/sheet", sheetDir)
+	if *compress {
+		FileServer(r, "/sheet", CompressedSheetDir{Dir: *sheet_dir})
+	} else {
+		FileServer(r, "/sheet", http.Dir(*sheet_dir))
+	}
 
 	addr := fmt.Sprintf(":%v", *port)
 

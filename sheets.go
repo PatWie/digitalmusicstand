@@ -44,12 +44,11 @@ func GetSheets(sheet_dir string) ([]Sheet, error) {
 	return sheets, nil
 }
 
-type SheetDir struct {
-	Compress bool
-	Dir      string
+type CompressedSheetDir struct {
+	Dir string
 }
 
-func (d SheetDir) Open(name string) (http.File, error) {
+func (d CompressedSheetDir) Open(name string) (http.File, error) {
 	if filepath.Separator != '/' && strings.ContainsRune(name, filepath.Separator) {
 		return nil, errors.New("http: invalid character in file path")
 	}
@@ -60,17 +59,15 @@ func (d SheetDir) Open(name string) (http.File, error) {
 
 	fullName := filepath.Join(dir, filepath.FromSlash(path.Clean("/"+name)))
 
-	if d.Compress {
-		fullNamePDFCompressed := filepath.Join(dir, filepath.FromSlash(path.Clean("/"+name)))
-		fullNamePDFCompressed = fullNamePDFCompressed[:len(fullNamePDFCompressed)-3] + "cpdf"
+	fullNamePDFCompressed := filepath.Join(dir, filepath.FromSlash(path.Clean("/"+name)))
+	fullNamePDFCompressed = fullNamePDFCompressed[:len(fullNamePDFCompressed)-3] + "cpdf"
 
-		if _, err := os.Stat(fullNamePDFCompressed); os.IsNotExist(err) {
-			// Try to compress
-			CompressPDF(fullName, fullNamePDFCompressed)
-			// if original was smaller, we use this file
-			if FileSize(fullName) < FileSize(fullNamePDFCompressed) {
-				FileCopy(fullName, fullNamePDFCompressed)
-			}
+	if _, err := os.Stat(fullNamePDFCompressed); os.IsNotExist(err) {
+		// Try to compress
+		CompressPDF(fullName, fullNamePDFCompressed)
+		// if original was smaller, we use this file
+		if FileSize(fullName) < FileSize(fullNamePDFCompressed) {
+			FileCopy(fullName, fullNamePDFCompressed)
 		}
 	}
 
