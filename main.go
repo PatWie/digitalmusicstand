@@ -60,6 +60,15 @@ func main() {
 	sheetDir := SheetDir{Compress: *compress, Dir: *sheet_dir}
 	FileServer(r, "/", box)
 	FileServer(r, "/sheets", sheetDir)
-	http.ListenAndServe(fmt.Sprintf(":%v", *port), r)
+
+	addr := fmt.Sprintf(":%v", *port)
+
+	fmt.Println("Digital Music Stand (https://github.com/PatWie/digitalmusicstand)",
+		"listens and serves at ", addr)
+
+	err = http.ListenAndServe(addr, r)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }
