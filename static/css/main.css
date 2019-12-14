@@ -27,7 +27,7 @@
   background-color: #414345;
 }
 
-html, body{
+html, body {
   overflow-x: hidden;
   overflow-y: hidden;
 }
@@ -55,17 +55,6 @@ html, body{
   font-size: 48px;
 }
 
-#intro {
-  position: fixed;
-  left: 25%;
-  width: 50%;
-  height: 100%;
-  top: 25%;
-  text-align: center;
-  font-size: 48px;
-  z-index: 500;
-}
-
 #prompt {
   position: fixed;
   left: 25%;
@@ -78,6 +67,48 @@ html, body{
   color: white;
   width: 50%;
   visibility: hidden;
+  z-index: 200;
+}
+
+#help {
+  top: 5%;
+  position: fixed;
+  left: 25%;
+  height: auto;
+  max-height: 50%;
+  width: auto;
+  background: #131618;
+  padding: 3em;
+  font-size: 16px;
+  color: white;
+  width: 50%;
+  visibility: hidden;
+  z-index: 200;
+}
+
+#help p{
+  text-align: right;
+}
+
+#help dl {
+  padding: 0.5em;
+}
+
+#help  dt {
+  font-weight: bold;
+  color: #fec531;
+  margin-top: 0.5em;
+}
+
+#help  dt::after {
+  content: ":   ";
+}
+
+#help  dd {
+  /*margin: 0 0 0 110px;*/
+  padding: 0 0 0.5em 0;
+  /*padding-left: 1em;*/
+  clear: left;
 }
 
 #prompt input {
@@ -94,8 +125,8 @@ html, body{
   margin-top: 0;
   color: #b3b3b3;
   padding: 0;
-  list-style-type: none;    /*height:270px;*/
-  max-height: 270px;
+  list-style-type: none;
+  max-height: 450px; /*270/45 = 10*/
   overflow-y: scroll;
 }
 
@@ -120,15 +151,14 @@ html, body{
 #statusbar {
   position: fixed;
   left: 0;
-  right:0;
+  right: 0;
   bottom: 0;
   background: #131618;
   padding-left: 15px;
   font-size: 13px;
   color: rgba(179, 179, 179, 0.4);
   display: flex;
-  justify-content: space-between;
-  /*z-index: -5;*/
+  justify-content: space-between;  /*z-index: -5;*/
 }
 
 body {
@@ -140,29 +170,31 @@ body {
   color: #fec531;
 }
 
-
-.btn{
-  position:fixed;
-  width:40.00px;
-  height:40.00px;
-  bottom:20px;
-  right:40px;
+.btn {
+  position: fixed;
+  width: 40.00px;
+  height: 40.00px;
+  bottom: 20px;
+  right: 40px;
   background: rgba(179, 179, 179, 0.1);
-  color:rgba(179, 179, 179, 0.5);
-  border-radius:50px;
-  text-align:center;
+  color: rgba(179, 179, 179, 0.5);
+  border-radius: 50px;
+  text-align: center;
 }
 
-.btn:hover{
+.btn:hover {
   cursor: pointer;
 }
 
-.btn i{
-  margin-top:12px;
+.btn i {
+  margin-top: 12px;
 }
 
 @keyframes spinner {
-  to {transform: rotate(360deg);}
+  to {
+    transform: rotate(360deg);
+  }
+
 }
 
 .spinner:before {

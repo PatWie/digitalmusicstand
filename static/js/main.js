@@ -114,6 +114,7 @@ function showQueryBar(e) {
     if ($('#prompt').css('visibility') === 'hidden') {
         e.preventDefault();
 
+        $('#help').css('visibility', 'hidden');
         $('#prompt').css('visibility', 'visible');
         $('#query').focus();
         $('#query').select();
@@ -159,7 +160,7 @@ function on_query() {
     } else {
         $("ul li").remove();
 
-        result_len = 5
+        result_len = 10
         $.each(objects, function(index, value) {
 
             if (index > result_len) {
@@ -203,12 +204,12 @@ $(function() {
     $(document).on('keyup', function(e) {
         // console.log(e.which)
 
-        if (e.which == 49) { // e.which == 37 ||
+        if (e.which == 37 || e.which == 49) { //
             e.preventDefault();
             scroll2page(current_page - 1)
         }
 
-        if (e.which == 50) { // e.which == 39 ||
+        if (e.which == 39 || e.which == 50) { //
             e.preventDefault();
             scroll2page(current_page + 1)
         }
@@ -228,6 +229,7 @@ $(function() {
             e.preventDefault();
             $('#query').blur();
             $('#prompt').css('visibility', 'hidden');
+            $('#help').css('visibility', 'hidden');
         }
         if (e.which == 13) {
             // enter/return
@@ -244,6 +246,13 @@ $(function() {
         if (e.key == 'p') {
             showQueryBar(e);
         }
+        if (e.key == 'h') {
+            if ($('#prompt').css('visibility') === 'hidden') {
+                $('#help').css('visibility', 'visible');
+            }
+        }
+
+
     });
     $("#prompt").click(function(e) {
         e.stopPropagation();
@@ -264,10 +273,10 @@ $(function() {
         scroll2page(current_page + 1)
     });
 
-    // $("#download_btn").click(function(e) {
-    //     e.stopPropagation();
-    //     pdf_url
-    // });
+    $("#help_btn").click(function(e) {
+        e.stopPropagation();
+        $('#help').css('visibility', 'visible');
+    });
 
     $("#refresh_btn").click(function(e) {
         e.stopPropagation();
@@ -279,5 +288,6 @@ $(function() {
 
     $('html').click(function() {
         $('#prompt').css('visibility', 'hidden');
+        $('#help').css('visibility', 'hidden');
     });
 });
