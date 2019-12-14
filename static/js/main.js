@@ -9,6 +9,8 @@ var page_width = 0;
 
 var old_q = '';
 
+var objects = []
+
 function scroll2page(target_page) {
 
     if (num_pages > 0 && $("canvas").eq(target_page) !== undefined) {
@@ -33,12 +35,14 @@ function scroll2page(target_page) {
     }
 }
 
-function renderPDF(url) {
+function renderPDF(url, title, artist) {
+    $("#status_title").text(title);
+    $("#status_artist").text(artist);
     $('#query').blur();
     $('#prompt').css('visibility', 'hidden');
-    $('#intro').css('visibility', 'visible');
-    $('#intro').html('Loading ...');
 
+
+    $('#spinner').addClass('spinner');
     $('#download_btn').css('visibility', 'visible');
     $('#download_btn').attr("href", url);
     // $('#intro').click();
@@ -49,18 +53,21 @@ function renderPDF(url) {
     pdfjsLib.getDocument(url).promise.then(function(pdf) {
         thePdf = pdf;
         viewer = document.getElementById('pdf-viewer');
-        for (page = 1; page <= pdf.numPages; page++) {
+        for (number_page = 1; number_page <= pdf.numPages; number_page++) {
             canvas = document.createElement("canvas");
             canvas.className = 'pdf-page-canvas';
             viewer.appendChild(canvas);
-            renderPage(page, canvas);
+            renderPage(number_page, canvas);
         }
         num_pages = pdf.numPages
+    }).then(function() {
+        $('#spinner').removeClass('spinner');
     });
 
     $("body").scrollLeft(0);
     current_page = 0;
     $('#intro').css('visibility', 'hidden');
+
 
 
 }
@@ -110,57 +117,85 @@ function showQueryBar(e) {
         $('#prompt').css('visibility', 'visible');
         $('#query').focus();
         $('#query').select();
+        if ($("#query").val() == '') {
+            on_query()
+        }
     }
+}
+
+function on_query() {
+    let q = $("#query").val();
+
+    if (q.length > 0) {
+        if (q != old_q) {
+            old_q = q;
+            let results = fuzzysort.go(q, objects, {
+                keys: ['title', 'artist'],
+                // scoreFn: score,
+                allowTypo: true
+            })
+
+            result_len = objects.length
+
+            $("ul li").remove();
+
+            $.each(results, function(index, value) {
+                let title = value.obj.title;
+                let artist = value.obj.artist;
+
+                let title_highlight = fuzzysort.highlight(value[0]) || value.obj.title;
+                let artist_highlight = fuzzysort.highlight(value[1]) || value.obj.artist;
+                let url = value.obj.url;
+                $("ul").append('<li data-url="' + url + '"  data-title="' + title + '"  data-artist="' + artist + '">' + title_highlight + '<small>' + artist_highlight + '</small></li>');
+            });
+            selectNthEnty(0);
+
+            $('li').click(function(e) {
+                renderPDF($(this).data('url'), $(this).data('title'), $(this).data('artist'))
+
+            });
+        }
+
+    } else {
+        $("ul li").remove();
+
+        result_len = 5
+        $.each(objects, function(index, value) {
+
+            if (index > result_len) {
+                return false;
+            }
+            let title = value.title;
+            let artist = value.artist;
+            let url = value.url;
+            $("ul").append('<li data-url="' + url + '"  data-title="' + title + '"  data-artist="' + artist + '">' + title + '<small>' + artist + '</small></li>');
+        });
+
+        $('li').click(function(e) {
+            renderPDF($(this).data('url'), $(this).data('title'), $(this).data('artist'))
+
+        });
+    }
+
+
 }
 
 $(function() {
 
-    let objects = []
+
 
     $.getJSON("/sheets.json", function(data) {
         objects = data;
         result_len = data.length;
+        $("#num_sheets").text(data.length + ' Sheets');
+        $("#status_num_sheets").text(data.length + ' Sheets');
     });
 
     function score(a) {
         return defaultScoreFn(a[0]) + defaultScoreFn(a[1])
     }
 
-    $("#query").keyup(function() {
-        let q = $("#query").val();
-
-        if (q.length > 0) {
-            if (q != old_q) {
-                old_q = q;
-                let results = fuzzysort.go(q, objects, {
-                    keys: ['title', 'artist'],
-                    // scoreFn: score,
-                    allowTypo: true
-                })
-
-                result_len = objects.length
-
-                $("ul li").remove();
-
-                $.each(results, function(index, value) {
-                    let title = fuzzysort.highlight(value[0]) || value.obj.title;
-                    let artist = fuzzysort.highlight(value[1]) || value.obj.artist;
-                    let url = value.obj.url;
-                    $("ul").append('<li data-url="' + url + '">' + title + '<small>' + artist + '</small></li>');
-                });
-                selectNthEnty(0);
-
-                $('li').click(function(e) {
-                    renderPDF($(this).data('url'))
-                });
-            }
-
-        } else {
-            result_len = 0
-        }
-
-
-    });
+    $("#query").keyup(on_query);
 
 
 
@@ -196,12 +231,14 @@ $(function() {
         }
         if (e.which == 13) {
             // enter/return
-            // renderPDF('/sheets/speechless.pdf');
+            // renderPDF('/sheet/speechless.pdf');
             if ($('#prompt').css('visibility') === 'hidden') {
                 // do nothing
             } else {
                 // change pdf
-                renderPDF($(".active").data('url'))
+                let a = $(".active");
+                renderPDF(a.data('url'), a.data('title'), a.data('artist'))
+
             }
         }
         if (e.key == 'p') {

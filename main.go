@@ -59,7 +59,7 @@ func main() {
 
 	sheetDir := SheetDir{Compress: *compress, Dir: *sheet_dir}
 	FileServer(r, "/", box)
-	FileServer(r, "/sheets", sheetDir)
+	FileServer(r, "/sheet", sheetDir)
 
 	addr := fmt.Sprintf(":%v", *port)
 

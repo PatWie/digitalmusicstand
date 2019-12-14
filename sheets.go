@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -27,7 +28,7 @@ func GetSheets(sheet_dir string) ([]Sheet, error) {
 
 	for _, match := range matches {
 		match = strings.ReplaceAll(match, (sheet_dir)+"/", "")
-		url := "/sheets/" + match
+		url := "/sheet/" + url.QueryEscape(match)
 		match = strings.ReplaceAll(match, ".pdf", "")
 		match = strings.ReplaceAll(match, "-", " ")
 
