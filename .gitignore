@@ -2,3 +2,8 @@ sheets/*
 !sheets/.keep
 /digitalmusicstand
 *-packr.go
+
+static.min/
+digitalmusicstand-*
+*.tar.gz
+*.zip

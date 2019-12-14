@@ -8,10 +8,18 @@ platform:
   arch: amd64
 
 steps:
-- name: pack
-  image: golang:1.13
+- name: minify_pack
+  image: patwie/dms-release:latest
   commands:
-  - go get -u github.com/gobuffalo/packr/v2/packr2
+  - rm -rf static.min
+  - mkdir static.min
+  - mkdir static.min/fonts
+  - mkdir static.min/css
+  - mkdir static.min/js
+  - minify -o static.min/css/min.css static/css/main.css static/css/all.min.css
+  - minify -o static.min/index.html static/index.html
+  - minify -o static.min/js/min.js static/js/jquery-3.4.1.min.js static/js/fuzzysort.js static/js/pdf.js static/js/pdf.worker.js static/js/main.js
+  - "cp static/fonts/* static.min/fonts/"
   - /go/bin/packr2
 
 - name: build-linux-amd64
@@ -78,5 +86,9 @@ steps:
   when:
     event:
     - tag
+
+---
+kind: signature
+hmac: af20957923d1dc19caa79fe21ab8504c8834c73799da7fc0216028f6c6506206
 
 ...

@@ -4,13 +4,22 @@ def main():
   ]
 
 
-def pack():
+def minify_pack():
   return {
-      'name': 'pack',
-      'image': 'golang:1.13',
+      'name': 'minify_pack',
+      'image': 'patwie/dms-release:latest',
+
       'commands': [
-          'go get -u github.com/gobuffalo/packr/v2/packr2',
-              '/go/bin/packr2',
+          'rm -rf static.min',
+          'mkdir static.min',
+          'mkdir static.min/fonts',
+          'mkdir static.min/css',
+          'mkdir static.min/js',
+          'minify -o static.min/css/min.css static/css/main.css static/css/all.min.css',
+          'minify -o static.min/index.html static/index.html',
+          'minify -o static.min/js/min.js static/js/jquery-3.4.1.min.js static/js/fuzzysort.js static/js/pdf.js static/js/pdf.worker.js static/js/main.js',
+          'cp static/fonts/* static.min/fonts/',
+          '/go/bin/packr2',
       ]
   }
 
@@ -76,7 +85,7 @@ def pipeline():
       'type': 'docker',
       'name': 'linux',
       'steps': [
-          pack(),
+          minify_pack(),
           build_step('linux', 'amd64'),
           build_step('linux', 'arm64'),
           build_step('linux', 'arm'),

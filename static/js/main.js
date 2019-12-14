@@ -1,6 +1,7 @@
 var thePdf = null;
 var result_id = 0;
 var result_len = 0;
+var pdf_url = null;
 
 var current_page = 0;
 var num_pages = 0;
@@ -38,6 +39,11 @@ function renderPDF(url) {
     $('#intro').css('visibility', 'visible');
     $('#intro').html('Loading ...');
 
+    $('#download_btn').css('visibility', 'visible');
+    $('#download_btn').attr("href", url);
+    // $('#intro').click();
+
+    pdf_url = url;
     thePdf = null;
     $('canvas').remove();
     pdfjsLib.getDocument(url).promise.then(function(pdf) {
@@ -117,13 +123,8 @@ $(function() {
     });
 
     function score(a) {
-        return (a[0] ? a[0].score : -1000000) + (a[1] ? a[1].score : -100000000);
+        return defaultScoreFn(a[0]) + defaultScoreFn(a[1])
     }
-
-    // $('#search_btn').click(function(e) {
-    //     e.preventDefault();
-    //     showQueryBar(e)
-    // });
 
     $("#query").keyup(function() {
         let q = $("#query").val();
@@ -133,7 +134,7 @@ $(function() {
                 old_q = q;
                 let results = fuzzysort.go(q, objects, {
                     keys: ['title', 'artist'],
-                    scoreFn: score,
+                    // scoreFn: score,
                     allowTypo: true
                 })
 
@@ -225,6 +226,11 @@ $(function() {
         e.stopPropagation();
         scroll2page(current_page + 1)
     });
+
+    // $("#download_btn").click(function(e) {
+    //     e.stopPropagation();
+    //     pdf_url
+    // });
 
     $("#refresh_btn").click(function(e) {
         e.stopPropagation();

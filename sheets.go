@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"path"
@@ -57,8 +56,6 @@ func (d SheetDir) Open(name string) (http.File, error) {
 	if dir == "" {
 		dir = "."
 	}
-
-	fmt.Println("sd")
 
 	fullName := filepath.Join(dir, filepath.FromSlash(path.Clean("/"+name)))
 

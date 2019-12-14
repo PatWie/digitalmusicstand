@@ -34,7 +34,7 @@ func FileServer(r chi.Router, path string, root http.FileSystem) {
 }
 
 func main() {
-	box = packr.New("myBox", "./static")
+	box = packr.New("myBox", "./static.min")
 
 	parser := argparse.NewParser("dm", "Digital Music Stand (https://github.com/PatWie/digitalmusicstand)")
 	sheet_dir := parser.String("s", "sheets", &argparse.Options{Required: false, Help: "Path to sheets", Default: "sheets"})
