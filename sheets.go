@@ -1,7 +1,7 @@
 package main
 
 import (
-	"errors"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -14,6 +14,51 @@ type Sheet struct {
 	Title  string `json:"title"`
 	Artist string `json:"artist"`
 	Url    string `json:"url"`
+}
+
+func UploadSheet(sheetDir string) func(http.ResponseWriter, *http.Request) {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		r.ParseMultipartForm(32 << 20)
+		clientFile, handler, err := r.FormFile("file")
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("400 - Cannot fetch uploaded file!"))
+			return
+		}
+		defer clientFile.Close()
+
+		buff := make([]byte, 512)
+		if _, err = clientFile.Read(buff); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("400 - Cannot read uploaded file!"))
+			return
+		}
+
+		if http.DetectContentType(buff) != "application/pdf" {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("400 - Uploaded file is not a PDF!"))
+			return
+		}
+
+		destinationPath := path.Join(sheetDir, handler.Filename)
+
+		_, err = os.Stat(destinationPath)
+		if os.IsNotExist(err) {
+			f, err := os.OpenFile(destinationPath, os.O_WRONLY|os.O_CREATE, 0666)
+			if err != nil {
+				w.WriteHeader(http.StatusOK)
+			}
+			defer f.Close()
+			io.Copy(f, clientFile)
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("400 - File already exists!"))
+			return
+		}
+
+	}
+
 }
 
 func GetSheets(sheet_dir string) ([]Sheet, error) {
@@ -42,39 +87,4 @@ func GetSheets(sheet_dir string) ([]Sheet, error) {
 	}
 
 	return sheets, nil
-}
-
-type CompressedSheetDir struct {
-	Dir string
-}
-
-func (d CompressedSheetDir) Open(name string) (http.File, error) {
-	if filepath.Separator != '/' && strings.ContainsRune(name, filepath.Separator) {
-		return nil, errors.New("http: invalid character in file path")
-	}
-	dir := d.Dir
-	if dir == "" {
-		dir = "."
-	}
-
-	fullName := filepath.Join(dir, filepath.FromSlash(path.Clean("/"+name)))
-
-	fullNamePDFCompressed := filepath.Join(dir, filepath.FromSlash(path.Clean("/"+name)))
-	fullNamePDFCompressed = fullNamePDFCompressed[:len(fullNamePDFCompressed)-3] + "cpdf"
-
-	if _, err := os.Stat(fullNamePDFCompressed); os.IsNotExist(err) {
-		// Try to compress
-		CompressPDF(fullName, fullNamePDFCompressed)
-		// if original was smaller, we use this file
-		if FileSize(fullName) < FileSize(fullNamePDFCompressed) {
-			FileCopy(fullName, fullNamePDFCompressed)
-		}
-	}
-
-	f, err := os.Open(fullName)
-	if err != nil {
-		return nil, err
-	}
-	return f, nil
-
 }

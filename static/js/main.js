@@ -39,7 +39,7 @@ function renderPDF(url, title, artist) {
     $("#status_title").text(title);
     $("#status_artist").text(artist);
     $('#query').blur();
-    $('#prompt').css('visibility', 'hidden');
+    $('#prompt-dialog').css('visibility', 'hidden');
 
 
     $('#spinner').addClass('spinner');
@@ -111,11 +111,11 @@ function selectNthEnty(n) {
 
 function showQueryBar(e) {
 
-    if ($('#prompt').css('visibility') === 'hidden') {
+    if ($('#prompt-dialog').css('visibility') === 'hidden') {
         e.preventDefault();
 
-        $('#help').css('visibility', 'hidden');
-        $('#prompt').css('visibility', 'visible');
+        $('#help-dialog').css('visibility', 'hidden');
+        $('#prompt-dialog').css('visibility', 'visible');
         $('#query').focus();
         $('#query').select();
         if ($("#query").val() == '') {
@@ -182,7 +182,11 @@ function on_query() {
 }
 
 $(function() {
-
+    if($("body").data('upload') == "enabled"){
+        $("#upload-dialog_btn").css('visibility', 'visible');
+    }else{
+        $("#upload-dialog_btn").css('visibility', 'hidden');
+    }
 
 
     $.getJSON("/sheets.json", function(data) {
@@ -199,6 +203,10 @@ $(function() {
     $("#query").keyup(on_query);
 
 
+    var myDropzone = new Dropzone("#upload-dialog", {
+        url: "/upload",
+        previewTemplate: document.querySelector('#dropzone-template').innerHTML
+    });
 
 
     $(document).on('keyup', function(e) {
@@ -228,13 +236,14 @@ $(function() {
             // esc
             e.preventDefault();
             $('#query').blur();
-            $('#prompt').css('visibility', 'hidden');
-            $('#help').css('visibility', 'hidden');
+            $('#prompt-dialog').css('visibility', 'hidden');
+            $('#help-dialog').css('visibility', 'hidden');
+            $('#upload-dialog').css('visibility', 'hidden');
         }
         if (e.which == 13) {
             // enter/return
             // renderPDF('/sheet/speechless.pdf');
-            if ($('#prompt').css('visibility') === 'hidden') {
+            if ($('#prompt-dialog').css('visibility') === 'hidden') {
                 // do nothing
             } else {
                 // change pdf
@@ -247,14 +256,22 @@ $(function() {
             showQueryBar(e);
         }
         if (e.key == 'h') {
-            if ($('#prompt').css('visibility') === 'hidden') {
-                $('#help').css('visibility', 'visible');
+            if ($('#prompt-dialog').css('visibility') === 'hidden') {
+                $('#help-dialog').css('visibility', 'visible');
+                $('#upload-dialog').css('visibility', 'hidden');
+            }
+        }
+        if (e.key == 'u') {
+            myDropzone.removeAllFiles();
+            if ($('#prompt-dialog').css('visibility') === 'hidden') {
+                $('#help-dialog').css('visibility', 'hidden');
+                $('#upload-dialog').css('visibility', 'visible');
             }
         }
 
 
     });
-    $("#prompt").click(function(e) {
+    $("#prompt-dialog").click(function(e) {
         e.stopPropagation();
     });
 
@@ -273,9 +290,16 @@ $(function() {
         scroll2page(current_page + 1)
     });
 
-    $("#help_btn").click(function(e) {
+    $("#help-dialog_btn").click(function(e) {
         e.stopPropagation();
-        $('#help').css('visibility', 'visible');
+        $('#help-dialog').css('visibility', 'visible');
+        $('#upload-dialog').css('visibility', 'hidden');
+    });
+
+    $("#upload-dialog_btn").click(function(e) {
+        e.stopPropagation();
+        $('#help-dialog').css('visibility', 'hidden');
+        $('#upload-dialog').css('visibility', 'visible');
     });
 
     $("#refresh_btn").click(function(e) {
@@ -287,7 +311,8 @@ $(function() {
     });
 
     $('html').click(function() {
-        $('#prompt').css('visibility', 'hidden');
-        $('#help').css('visibility', 'hidden');
+        $('#prompt-dialog').css('visibility', 'hidden');
+        $('#help-dialog').css('visibility', 'hidden');
+        $('#upload-dialog').css('visibility', 'hidden');
     });
 });

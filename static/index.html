@@ -4,19 +4,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>Digital Music Stand</title>
     <link href="/css/min.css" rel="stylesheet">
-    <script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
-    <script type="text/javascript" src="/js/pdf.min.js"></script>
-    <script type="text/javascript" src="/js/main.min.js"></script>
   </head>
-  <body>
-    <div id='prompt'>
+  <body data-upload="disabled">
+    <div id='prompt-dialog'>
       <input type="text" id="query" name="query" value="" />
     <ul id="results"> </ul>
   </div>
   <div id='pdf-viewer'></div>
   <div id='spinner'></div>
   <div id='intro'>Digital Music Stand<br> Press 'p' to select a sheet from <span id='num_sheets'></span></div>
-  <div id='help'>
+  <div id='help-dialog'>
     <h2>Digital Music Stand - Help</h2>
     <dl>
       <dt>h</dt><dd> opens help dialog</dd>
@@ -30,6 +27,18 @@
     </dl>
     <p>https://github.com/PatWie/digitalmusicstand</p>
   </div>
+  <div  id="dropzone-template">
+    <div class="dz-preview dz-file-preview">
+      <div class="dz-details">
+        <div class="dz-filename"><span data-dz-name></span></div>
+      </div>
+      <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+      <div class="dz-error-message"><span data-dz-errormessage></span></div>
+    </div>
+  </div>
+  <div id='upload-dialog'>
+    Drag files here to upload them
+  </div>
   <div id='statusbar'>
     <div></div>
     <div id='status_title'></div>
@@ -42,7 +51,12 @@
   <a href="#" class="btn" id="right_btn" style="right:90px;"><i class="fas fa-chevron-circle-right"></i></a>
   <a href="#" class="btn" id="left_btn" style="right:140px;"><i class="fas fa-chevron-circle-left"></i></a>
   <a href="#" class="btn" id="refresh_btn" style="right:190px;"><i class="fas fa-sync"></i></a>
-  <a href="#" class="btn" id="help_btn" style="right:240px;"><i class="fas fa-question"></i></a>
+  <a href="#" class="btn" id="help-dialog_btn" style="right:240px;"><i class="fas fa-question"></i></a>
   <a href="#" class="btn" target="_blank" id="download_btn" style="right:290px; visibility: hidden;"><i class="fas fa-file-pdf"></i></a>
+  <a href="#" class="btn" id="upload-dialog_btn" style="right:340px; visibility: hidden;"><i class="fas fa-file-upload"></i></a>
 </body>
+<script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="/js/pdf.min.js"></script>
+<script type="text/javascript" src="/js/dropzone.min.js"></script>
+<script type="text/javascript" src="/js/main.min.js"></script>
 </html>

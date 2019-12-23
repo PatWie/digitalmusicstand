@@ -55,7 +55,7 @@ html, body {
   font-size: 48px;
 }
 
-#prompt {
+#prompt-dialog {
   position: fixed;
   left: 25%;
   height: auto;
@@ -70,7 +70,11 @@ html, body {
   z-index: 200;
 }
 
-#help {
+#results{
+  background: #131618;
+}
+
+#help-dialog {
   top: 5%;
   position: fixed;
   left: 25%;
@@ -84,34 +88,39 @@ html, body {
   width: 50%;
   visibility: hidden;
   z-index: 200;
+  border: #fec53133 1px solid;
+  overflow-x: scroll;
+
 }
 
-#help p{
+
+
+#help-dialog p{
   text-align: right;
 }
 
-#help dl {
+#help-dialog dl {
   padding: 0.5em;
 }
 
-#help  dt {
+#help-dialog  dt {
   font-weight: bold;
   color: #fec531;
   margin-top: 0.5em;
 }
 
-#help  dt::after {
+#help-dialog  dt::after {
   content: ":   ";
 }
 
-#help  dd {
+#help-dialog  dd {
   /*margin: 0 0 0 110px;*/
   padding: 0 0 0.5em 0;
   /*padding-left: 1em;*/
   clear: left;
 }
 
-#prompt input {
+#prompt-dialog input {
   background: #191E21;
   border: none;
   font-size: 20px;
@@ -121,7 +130,7 @@ html, body {
   margin: 0;
 }
 
-#prompt ul {
+#prompt-dialog ul {
   margin-top: 0;
   color: #b3b3b3;
   padding: 0;
@@ -130,23 +139,80 @@ html, body {
   overflow-y: scroll;
 }
 
-#prompt ul li {
+#prompt-dialog ul li {
   height: 40px;
   padding: 5px;
 }
 
-#prompt ul li small {
+#prompt-dialog ul li small {
   display: block;
 }
 
-#prompt ul li.active {
+#prompt-dialog ul li.active {
   background-color: #333537;
 }
 
-#prompt ul li:hover {
+#prompt-dialog ul li:hover {
   background-color: #44474a;
   cursor: pointer;
 }
+
+#upload-dialog{
+  top: 12.5%;
+  position: fixed;
+  left: 12.5%;
+  height: 75%;
+  width: 75%;
+  z-index: 200;
+  z-index:200;
+  /*border: #fec53133 1px solid;*/
+
+  background: #131618;
+  border: #fec53133 1px dashed;
+  /*max-height: 50%;*/
+
+    color: rgba(179, 179, 179, 0.2);
+  text-align: center;
+  vertical-align: middle;
+  font-size: 48px;
+  visibility: hidden;
+
+}
+
+.dropzone {
+  /*background: #131618;*/
+/*border: #fec53133 1px dashed;*/
+/*width:50%;*/
+/*height:50%;*/
+  max-height: 50%;
+  max-width: 50%;
+}
+
+.dz-drag-hover{
+border: #fec531 1px solid !important;
+color:#fec531 !important;
+/*border: solid;*/
+
+}
+
+.dz-preview{
+  font-size: 16px;
+  text-align: left;
+}
+
+.dz-success{
+  color: #489d45 !important;
+
+}
+.dz-error{
+  color: #990a0a !important;
+}
+
+
+.error-message{
+  font-size: 0.8rem;
+}
+
 
 #statusbar {
   position: fixed;
@@ -156,6 +222,7 @@ html, body {
   background: #131618;
   padding-left: 15px;
   font-size: 13px;
+  height:15px;
   color: rgba(179, 179, 179, 0.4);
   display: flex;
   justify-content: space-between;  /*z-index: -5;*/
@@ -166,7 +233,7 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
-#prompt b {
+#prompt-dialog b {
   color: #fec531;
 }
 
