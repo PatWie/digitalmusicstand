@@ -21,6 +21,7 @@ steps:
   - minify -o static.min/js/jquery-3.4.1.min.js static/js/jquery-3.4.1.min.js
   - minify -o static.min/js/pdf.min.js static/js/pdf.js static/js/pdf.worker.js
   - minify -o static.min/js/main.min.js static/js/fuzzysort.js static/js/main.js
+  - minify -o static.min/js/dropzone.min.js static/js/dropzone.js
   - "cp static/fonts/* static.min/fonts/"
   - cp static/favicon.ico static.min/favicon.ico
   - /go/bin/packr2
@@ -92,6 +93,6 @@ steps:
 
 ---
 kind: signature
-hmac: 4c84c84585046136b9e75e2c1e14a2a2e50c13713d91faa0c29bb80986f0eb66
+hmac: e856be57aa7aaa40f0533cdce7a63a250ec5097ee15fe037227bc303daf94c3f
 
 ...
