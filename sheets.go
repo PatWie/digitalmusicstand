@@ -13,7 +13,7 @@ import (
 type Sheet struct {
 	Title  string `json:"title"`
 	Artist string `json:"artist"`
-	Url    string `json:"url"`
+	URL    string `json:"url"`
 }
 
 func UploadSheet(sheetDir string) func(http.ResponseWriter, *http.Request) {
@@ -61,10 +61,10 @@ func UploadSheet(sheetDir string) func(http.ResponseWriter, *http.Request) {
 
 }
 
-func GetSheets(sheet_dir string) ([]Sheet, error) {
+func GetSheets(sheetDir string) ([]Sheet, error) {
 	sheets := []Sheet{}
 
-	pattern := (sheet_dir) + "/*_*.pdf"
+	pattern := sheetDir + "/*_*.pdf"
 	matches, err := filepath.Glob(pattern)
 
 	if err != nil {
@@ -72,7 +72,7 @@ func GetSheets(sheet_dir string) ([]Sheet, error) {
 	}
 
 	for _, match := range matches {
-		match = strings.ReplaceAll(match, (sheet_dir)+"/", "")
+		match = strings.ReplaceAll(match, (sheetDir)+"/", "")
 		url := "/sheet/" + url.QueryEscape(match)
 		match = strings.ReplaceAll(match, ".pdf", "")
 		match = strings.ReplaceAll(match, "-", " ")
@@ -82,7 +82,7 @@ func GetSheets(sheet_dir string) ([]Sheet, error) {
 			artist := strings.Title(strings.ToLower(tokens[0]))
 			title := strings.Title(strings.ToLower(tokens[1]))
 
-			sheets = append(sheets, Sheet{Title: title, Artist: artist, Url: url})
+			sheets = append(sheets, Sheet{Title: title, Artist: artist, URL: url})
 		}
 	}
 
