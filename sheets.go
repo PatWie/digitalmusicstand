@@ -50,6 +50,7 @@ func UploadSheet(sheetDir string) func(http.ResponseWriter, *http.Request) {
 				w.WriteHeader(http.StatusOK)
 			}
 			defer f.Close()
+			clientFile.Seek(0, io.SeekStart)
 			io.Copy(f, clientFile)
 		} else {
 			w.WriteHeader(http.StatusBadRequest)
