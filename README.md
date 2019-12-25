@@ -4,13 +4,14 @@
 
 A simple cross-platform browser-based pdfjs-based viewer to display and search music sheets.
 
-<img src="./.github/digitalmusicstand_001.jpg" />
+<img src="./.github/digitalmusicstand_001.gif" />
 
-* Fast, single binary which includes all assets.
-* Usage is similar to Sublime. Press `P` and perform a fuzzy search.
+* A single binary including all assets.
+* Usage is similar to SublimeText. Press `P` and perform a fuzzy search.
 * Not database required
 * Shortcuts `1,2` to scroll to previous/next page using a programmable foot pedal.
-* Unobtrusive design to download the file as a pdf
+* Unobtrusive design
+* Upload PDF when enabled
 
 ## DEMO
 
@@ -26,6 +27,7 @@ You can use the arrow keys (up/down) to navigate. But for now select `Sonata No.
 <dl>
   <dt>h</dt><dd> opens help dialog</dd>
   <dt>p</dt><dd> opens prompt for a query</dd>
+  <dt>u</dt><dd> opens dialog to upload pdf (when enabled)</dd>
   <dt>enter</dt><dd> loads select sheet</dd>
   <dt>esc</dt><dd> closes all modal dialogs</dd>
   <dt>arrow key down</dt><dd> selects next entry in result list</dd>

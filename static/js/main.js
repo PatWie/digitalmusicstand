@@ -63,6 +63,7 @@ $(function() {
             $('#query').select();
 
             perform_query();
+            // this.select_entry(0);
         }
 
         hide() {
@@ -75,12 +76,12 @@ $(function() {
             if (e.which == 40) {
                 // arrow down
                 e.preventDefault();
-                Results.selectNthEnty(Results.current() + 1);
+                Results.select_entry(Results.current() + 1);
             }
             if (e.which == 38) {
                 // arrow up
                 e.preventDefault();
-                Results.selectNthEnty(Results.current() - 1);
+                Results.select_entry(Results.current() - 1);
             }
             if (e.which == 13) {
                 // enter/return
@@ -314,7 +315,7 @@ $(function() {
         data: [],
         q_old: null,
         found_items: [],
-        item_idx: 0,
+        item_idx: -1,
         current_params_: null,
 
         load: function() {
@@ -338,7 +339,7 @@ $(function() {
             return this.item_idx;
         },
 
-        selectNthEnty: function(n) {
+        select_entry: function(n) {
             this.item_idx = Math.min(this.found_items.length - 1, Math.max(0, n))
 
             $("li[class='active']").removeClass('active');
@@ -392,9 +393,10 @@ $(function() {
                         keys: ['title', 'artist'],
                         allowTypo: true
                     })
+                    self.item_idx = -1
 
                     this.draw_list(self.found_items);
-                    // this.selectNthEnty(0);
+                    // this.select_entry(0);
 
                 }
 
@@ -422,7 +424,7 @@ $(function() {
                     })
                 });
                 this.draw_list(self.found_items);
-                // this.selectNthEnty(0);
+                // this.select_entry(0);
 
 
 
