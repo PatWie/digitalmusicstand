@@ -386,8 +386,16 @@ $(function() {
 
         build_list: function(q) {
             var self = this;
+
+            var select_first_entry = false;
+            if (self.found_items.length === 0) {
+                select_first_entry = true
+            }
+
             if (q.length > 0) {
                 if (q != this.old_q) {
+
+
                     this.old_q = q;
                     self.found_items = fuzzysort.go(q, self.data, {
                         keys: ['title', 'artist'],
@@ -396,7 +404,7 @@ $(function() {
                     self.item_idx = -1
 
                     this.draw_list(self.found_items);
-                    // this.select_entry(0);
+                    select_first_entry = true
 
                 }
 
@@ -424,11 +432,11 @@ $(function() {
                     })
                 });
                 this.draw_list(self.found_items);
-                // this.select_entry(0);
 
+            }
 
-
-
+            if (select_first_entry) {
+                this.select_entry(0);
             }
         }
     };
