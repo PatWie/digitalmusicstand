@@ -292,12 +292,11 @@ $(function() {
         SheetApp.scroll_to_page(SheetApp.current_page_number - 1);
     });
 
-    $("#help-dialog_btn").click(function(e) {
-        if (dialogs.active_dialog() === undefined) {
-            e.stopPropagation();
-            dialogs.show(1);
-        }
+    $("#refresh_btn").click(function(e) {
+        e.stopPropagation();
+        Results.load();
     });
+
 
     $("#search_btn").click(function(e) {
         if (dialogs.active_dialog() === undefined) {
@@ -306,9 +305,20 @@ $(function() {
         }
     });
 
-    $("#refresh_btn").click(function(e) {
-        e.stopPropagation();
-        Results.load();
+    $("#help-dialog_btn").click(function(e) {
+        if (dialogs.active_dialog() === undefined) {
+            e.stopPropagation();
+            dialogs.show(1);
+        }
+    });
+
+    $("#upload-dialog_btn").click(function(e) {
+        if ($("body").data('upload') == "enabled") {
+            if (dialogs.active_dialog() === undefined) {
+                e.stopPropagation();
+                dialogs.show(2);
+            }
+        }
     });
 
     var Results = {
