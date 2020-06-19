@@ -55,7 +55,7 @@ cd digitalmusicstand
 ## Usage
 
 ```bash
-./digitalmusicstand --sheets /path/to/pdfs --port 3000
+./digitalmusicstand --sheets /path/to/pdfs --listen :3000
 ```
 
 The files in the sheet directoy need to follow the convention `interpret_title.pdf`.
