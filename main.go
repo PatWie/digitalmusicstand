@@ -41,6 +41,8 @@ func main() {
 	sheetDir := parser.String("s", "sheets", &argparse.Options{Required: false, Help: "Path to sheets", Default: "sheets"})
 	addr := parser.String("l", "listen", &argparse.Options{Required: false, Help: "Listen at", Default: ":3000"})
 	allowUploads := parser.Flag("u", "allow-uploads", &argparse.Options{Required: false, Help: "Allow Uploads", Default: false})
+	parsePdf := parser.Flag("p", "parse-pdf", &argparse.Options{Required: false, Help: "Parse PDF Files", Default: false})
+	parseYaml := parser.Flag("y", "parse-yaml", &argparse.Options{Required: false, Help: "Parse Yaml Files", Default: false})
 
 	err := parser.Parse(os.Args)
 	if err != nil {
@@ -52,7 +54,7 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Get("/sheets.json", func(w http.ResponseWriter, r *http.Request) {
-		sheets, err := GetSheets(*sheetDir)
+		sheets, err := GetSheets(*sheetDir, *parsePdf, *parseYaml)
 		if err != nil {
 			log.Fatal(parser.Usage(err))
 		}

@@ -2,18 +2,35 @@ package main
 
 import (
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 )
 
 type Sheet struct {
-	Title  string `json:"title"`
-	Artist string `json:"artist"`
-	URL    string `json:"url"`
+	Title      string `json:"title"`
+	Artist     string `json:"artist"`
+	BookArtist string `json:"bookartist"`
+	BookTitle  string `json:"booktitle"`
+	URL        string `json:"url"`
+	Pages      []int  `json:"pages"`
+}
+
+type SheetConfig struct {
+	BookPath   string `yaml:"path"`
+	BookArtist string `yaml:"artist"`
+	BookTitle  string `yaml:"title"`
+	Songs      []struct {
+		Artist string `yaml:"artist"`
+		Title  string `yaml:"title"`
+		Pages  []int  `yaml:",flow"`
+	}
 }
 
 func UploadSheet(sheetDir string) func(http.ResponseWriter, *http.Request) {
@@ -62,28 +79,72 @@ func UploadSheet(sheetDir string) func(http.ResponseWriter, *http.Request) {
 
 }
 
-func GetSheets(sheetDir string) ([]Sheet, error) {
+func GetSheets(sheetDir string, parsePdf bool, parseYaml bool) ([]Sheet, error) {
 	sheets := []Sheet{}
+	//processed_pdfs := []string{}
 
-	pattern := sheetDir + "/*_*.pdf"
-	matches, err := filepath.Glob(pattern)
+	// process yaml files
+	if parseYaml {
+		pattern := sheetDir + "/*.yml"
+		matches, err := filepath.Glob(pattern)
 
-	if err != nil {
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
+
+		for _, match := range matches {
+			yamlFile, err := ioutil.ReadFile(match)
+
+			if err != nil {
+				return nil, err
+				continue
+			}
+
+			sheetConfig := SheetConfig{}
+
+			err = yaml.Unmarshal(yamlFile, &sheetConfig)
+
+			if err != nil {
+				return nil, err
+				continue
+			}
+
+			url := "/sheet/" + url.QueryEscape(sheetConfig.BookPath)
+
+			if len(sheetConfig.Songs) > 0 {
+				for _, song := range sheetConfig.Songs {
+					sheets = append(sheets, Sheet{Title: song.Title, Artist: song.Artist, URL: url, Pages: song.Pages,
+						BookArtist: sheetConfig.BookArtist, BookTitle: sheetConfig.BookTitle})
+				}
+			} else {
+				sheets = append(sheets, Sheet{Title: sheetConfig.BookTitle, Artist: sheetConfig.BookArtist, URL: url})
+			}
+		}
 	}
 
-	for _, match := range matches {
-		match = strings.ReplaceAll(match, (sheetDir)+"/", "")
-		url := "/sheet/" + url.QueryEscape(match)
-		match = strings.ReplaceAll(match, ".pdf", "")
-		match = strings.ReplaceAll(match, "-", " ")
+	// process pdf files
+	if parsePdf {
+		pattern := sheetDir + "/*_*.pdf"
+		matches, err := filepath.Glob(pattern)
 
-		tokens := strings.Split(match, "_")
-		if len(tokens) == 2 {
-			artist := strings.Title(strings.ToLower(tokens[0]))
-			title := strings.Title(strings.ToLower(tokens[1]))
+		if err != nil {
+			return nil, err
+		}
 
-			sheets = append(sheets, Sheet{Title: title, Artist: artist, URL: url})
+		for _, match := range matches {
+			match = strings.ReplaceAll(match, (sheetDir)+"/", "")
+
+			url := "/sheet/" + url.QueryEscape(match)
+			match = strings.ReplaceAll(match, ".pdf", "")
+			match = strings.ReplaceAll(match, "-", " ")
+
+			tokens := strings.Split(match, "_")
+			if len(tokens) == 2 {
+				artist := strings.Title(strings.ToLower(tokens[0]))
+				title := strings.Title(strings.ToLower(tokens[1]))
+
+				sheets = append(sheets, Sheet{Title: title, Artist: artist, URL: url})
+			}
 		}
 	}
 
