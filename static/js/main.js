@@ -141,6 +141,7 @@ $(function() {
 
     var SheetApp = {
         pdfUrl: null,
+        pdfPages: null,
         pdfDocument: null,
         pdfViewer: null,
         pdfLoadingTask: null,
@@ -155,8 +156,15 @@ $(function() {
             let container = $("body");
             let target_canvas = $("canvas").eq(page_number);
             const skip = self.page_width + 2;
-            if (self.pdfDocument !== null && self.pdfDocument.numPages > 0 && target_canvas !== undefined) {
-                if ((page_number >= 0) && (page_number < self.pdfDocument.numPages)) {
+
+            let max_page_number = self.pdfDocument.numPages;
+
+            if (self.pdfPages) {
+                max_page_number = self.pdfPages.split(',').length;
+            }
+
+            if (self.pdfDocument !== null && max_page_number > 0 && target_canvas !== undefined) {
+                if ((page_number >= 0) && (page_number < max_page_number)) {
                     self.current_page_number = page_number;
                     container.animate({
                         scrollLeft: container.position().left + page_number * skip
@@ -212,6 +220,7 @@ $(function() {
             var self = this;
 
             self.pdfUrl = params.url;
+            self.pdfPages = params.pages;
             self.pdfDocument = null;
 
 
@@ -258,11 +267,17 @@ $(function() {
                     self.pdfDocument = pdfDocument;
                     self.pdfViewer = document.getElementById('pdf-viewer');
 
-                    for (page_number = 1; page_number <= pdfDocument.numPages; page_number++) {
+                    let page_numbers = Array.from(Array(pdfDocument.numPages), (_, i) => i + 1)
+
+                    if (self.pdfPages) {
+                        page_numbers = self.pdfPages.split(',');
+                    }
+
+                    for (i in page_numbers) {
                         canvas = document.createElement("canvas");
                         canvas.className = 'pdf-page-canvas';
                         self.pdfViewer.appendChild(canvas);
-                        render_page(self, page_number, canvas);
+                        render_page(self, parseInt(page_numbers[i]), canvas);
                     }
 
                     self.loading_finished();
@@ -368,6 +383,7 @@ $(function() {
                 url: a.data('url'),
                 artist: a.data('artist'),
                 title: a.data('title'),
+                pages: a.data('pages'),
             }
 
         },
@@ -381,7 +397,9 @@ $(function() {
                 let title_highlight = fuzzysort.highlight(value[0]) || value.obj.title;
                 let artist_highlight = fuzzysort.highlight(value[1]) || value.obj.artist;
                 let url = value.obj.url;
-                $("ul").append('<li data-url="' + url + '"  data-title="' + title + '"  data-artist="' + artist + '">' + title_highlight + '<small>' + artist_highlight + '</small></li>');
+                let pages = value.obj.pages;
+
+                $("ul").append('<li data-url="' + url + '" data-title="' + title + '" data-artist="' + artist + '" data-pages="' + pages + '">' + title_highlight + '<small>' + artist_highlight + '</small></li>');
             });
 
             $('li').click(function(e) {
@@ -389,6 +407,7 @@ $(function() {
                     url: $(this).data('url'),
                     artist: $(this).data('artist'),
                     title: $(this).data('title'),
+                    pages: $(this).data('pages'),
                 }
                 SheetApp.open(params);
             });
@@ -433,9 +452,8 @@ $(function() {
                         obj: {
                             title: value.title,
                             artist: value.artist,
-                            url: value.url
-
-
+                            url: value.url,
+                            pages: value.pages,
                         },
                         0: null,
                         1: null,
@@ -456,6 +474,7 @@ $(function() {
     dialogs = new Dialogs();
     dialogs.push(new PromptDialog($('#prompt-dialog')), 'p');
     dialogs.push(new Dialog($('#help-dialog')), 'h');
+
     if ($("body").data('upload') == "enabled") {
         $("#upload-dialog_btn").css('visibility', 'visible');
         dialogs.push(new UploadDialog($('#upload-dialog')), 'u');
