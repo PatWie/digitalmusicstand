@@ -1,15 +1,12 @@
 'use strict';
 
 $(function() {
-
     var myDropzone = new Dropzone("#upload-dialog", {
         url: "/upload",
         previewTemplate: document.querySelector('#dropzone-template').innerHTML
     });
 
-
     class Dialog {
-
         constructor(element) {
             this.element = element;
             this.visibility = false;
@@ -43,7 +40,6 @@ $(function() {
             this.element.css('visibility', 'hidden');
             this.close_implementation();
         }
-
     }
 
     function perform_query() {
@@ -52,8 +48,6 @@ $(function() {
     }
 
     class PromptDialog extends Dialog {
-
-
         init(element) {
             $("#query").keyup(perform_query);
         }
@@ -122,7 +116,6 @@ $(function() {
             this.shortcuts.push(shortcut);
         }
 
-
         show(idx) {
             this.active_idx = idx;
             this.active_dialog().show();
@@ -133,15 +126,10 @@ $(function() {
             for (var i = this.shortcuts.length - 1; i >= 0; i--) {
                 if (e.key == this.shortcuts[i]) {
                     this.show(i);
-
                 }
             }
-
         }
     }
-
-
-
 
     var SheetApp = {
         pdfUrl: null,
@@ -191,22 +179,22 @@ $(function() {
             this.pdfLoadingTask = null;
             if (this.pdfDocument) {
                 this.pdfDocument = null;
-
             }
             return promise;
         },
-
 
         on_key_up: function(e) {
             if (e.which == 37 || e.which == 49) {
                 e.preventDefault();
                 this.scroll_to_page(this.current_page_number - 1);
             }
+
             if (e.which == 39 || e.which == 50) {
                 e.preventDefault();
                 this.scroll_to_page(this.current_page_number + 1);
             }
         },
+
         loading_finished: function() {
             $('#spinner').removeClass('spinner');
         },
@@ -226,7 +214,6 @@ $(function() {
             self.pdfUrl = params.url;
             self.pdfPages = params.pages;
             self.pdfDocument = null;
-
 
             // Loading document.
             var loadingTask = pdfjsLib.getDocument({
@@ -262,12 +249,9 @@ $(function() {
                 });
             };
 
-
             $('canvas').remove();
+
             return loadingTask.promise.then(function(pdfDocument) {
-
-
-
                     self.pdfDocument = pdfDocument;
                     self.pdfViewer = document.getElementById('pdf-viewer');
 
@@ -298,7 +282,6 @@ $(function() {
                 self.loading_finished();
             });
         },
-
     };
 
     $("#right_btn").click(function(e) {
@@ -315,7 +298,6 @@ $(function() {
         e.stopPropagation();
         Results.load();
     });
-
 
     $("#search_btn").click(function(e) {
         if (dialogs.active_dialog() === undefined) {
@@ -374,7 +356,6 @@ $(function() {
             $("li[class='active']").removeClass('active');
             $("li").eq(this.item_idx).addClass("active");
 
-
             var current_offset = $("li[class='active']").offset();
             if (current_offset !== undefined) {
                 $("ul").scrollTop(
@@ -389,7 +370,6 @@ $(function() {
                 title: a.data('title'),
                 pages: a.data('pages'),
             }
-
         },
 
         draw_list: function(items) {
@@ -413,22 +393,21 @@ $(function() {
                     title: $(this).data('title'),
                     pages: $(this).data('pages'),
                 }
+
                 SheetApp.open(params);
             });
         },
 
         build_list: function(q) {
             var self = this;
-
             var select_first_entry = false;
+
             if (self.found_items.length === 0) {
                 select_first_entry = true
             }
 
             if (q.length > 0) {
                 if (q != this.old_q) {
-
-
                     this.old_q = q;
                     self.found_items = fuzzysort.go(q, self.data, {
                         keys: ['title', 'artist'],
@@ -438,9 +417,7 @@ $(function() {
 
                     this.draw_list(self.found_items);
                     select_first_entry = true
-
                 }
-
             } else {
                 // show default 10 entries
                 var self = this;
@@ -452,6 +429,7 @@ $(function() {
                     // if (index > max_display_items) {
                     //     return false;
                     // }
+
                     self.found_items.push({
                         obj: {
                             title: value.title,
@@ -463,8 +441,8 @@ $(function() {
                         1: null,
                     })
                 });
-                this.draw_list(self.found_items);
 
+                this.draw_list(self.found_items);
             }
 
             if (select_first_entry) {
@@ -486,7 +464,6 @@ $(function() {
         $("#upload-dialog_btn").css('visibility', 'hidden');
     }
 
-
     $(document).on('keyup', function(e) {
         let active_dialog = dialogs.active_dialog();
 
@@ -505,7 +482,6 @@ $(function() {
         }
     })
 
-
     $('html').click(function() {
         let active_dialog = dialogs.active_dialog();
         if (active_dialog !== undefined) {
@@ -513,6 +489,4 @@ $(function() {
             dialogs.active_idx = -1;
         }
     });
-
-
 });
