@@ -35,6 +35,7 @@ $(function() {
         show() {
             this.visibility = true;
             this.element.css('visibility', 'visible');
+            $('#intro').css('visibility', 'hidden');
         }
 
         hide() {
@@ -61,7 +62,8 @@ $(function() {
             super.show();
             $('#query').focus();
             $('#query').select();
-
+            $('#list-viewer').css('visibility', 'visible');
+            $('#pdf-viewer').css('visibility', 'hidden');
             perform_query();
             // this.select_entry(0);
         }
@@ -70,6 +72,8 @@ $(function() {
             super.hide();
             $('#query').blur();
             $('#query').blur();
+            $('#pdf-viewer').css('visibility', 'visible');
+            $('#list-viewer').css('visibility', 'hidden');
         }
 
         on_key_up_implementation(e) {
@@ -373,7 +377,7 @@ $(function() {
         },
 
         draw_list: function(items) {
-            $("ul li").remove();
+            $("#list-viewer ul li").remove();
 
             $.each(items, function(index, value) {
                 let title = value.obj.title;
@@ -381,7 +385,7 @@ $(function() {
                 let title_highlight = fuzzysort.highlight(value[0]) || value.obj.title;
                 let artist_highlight = fuzzysort.highlight(value[1]) || value.obj.artist;
                 let url = value.obj.url;
-                $("ul").append('<li data-url="' + url + '"  data-title="' + title + '"  data-artist="' + artist + '">' + title_highlight + '<small>' + artist_highlight + '</small></li>');
+                $("#list-viewer ul").append('<li data-url="' + url + '"  data-title="' + title + '"  data-artist="' + artist + '">' + title_highlight + '<small>' + artist_highlight + '</small></li>');
             });
 
             $('li').click(function(e) {
@@ -426,9 +430,9 @@ $(function() {
                 self.found_items = []
                 $.each(self.data, function(index, value) {
 
-                    if (index > max_display_items) {
-                        return false;
-                    }
+                    // if (index > max_display_items) {
+                    //     return false;
+                    // }
                     self.found_items.push({
                         obj: {
                             title: value.title,

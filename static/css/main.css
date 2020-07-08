@@ -33,8 +33,53 @@ html, body {
 }
 
 #pdf-viewer {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 3000%;
   height: 100%;
+}
+
+#list-viewer {
+  width: 100%;
+  margin-top:55px;
+  height: 90%;
+  background-color: #12181c;
+  /*z-index:1000;*/
+}
+
+#list-viewer ul {
+  margin-top: 0;
+  color: #b3b3b3;
+  padding: 0;
+  list-style-type: none;
+  max-height: 100%; /*270/45 = 10*/
+  overflow-y: scroll;
+  columns: 3;
+
+}
+
+#list-viewer ul li {
+  height: 40px;
+  padding: 5px;
+  border-bottom: #333537 1px solid;
+}
+
+#list-viewer ul li small {
+  display: block;
+}
+
+#list-viewer ul li.active {
+  background-color: #333537;
+}
+
+#list-viewer ul li:hover {
+  background-color: #44474a;
+  cursor: pointer;
+}
+
+#list-viewer b {
+  color: #fec531;
 }
 
 .pdf-page-canvas {
