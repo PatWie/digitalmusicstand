@@ -63,6 +63,7 @@ html, body {
   height: 40px;
   padding: 5px;
   border-bottom: #333537 1px solid;
+  break-inside: avoid-column;
 }
 
 #list-viewer ul li small {
