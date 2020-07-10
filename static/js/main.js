@@ -384,6 +384,7 @@ $(function() {
                 let pages = value.obj.pages;
 
                 $("#list-viewer ul").append('<li data-url="' + url + '"  data-title="' + title + '"  data-artist="' + artist + '" data-pages="' + pages + '">' + title_highlight + '<small>' + artist_highlight + '</small></li>');
+
             });
 
             $('li').click(function(e) {
