@@ -32,10 +32,8 @@ html, body {
   overflow-y: hidden;
 }
 
+
 #pdf-viewer {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 3000%;
   height: 100%;
 }

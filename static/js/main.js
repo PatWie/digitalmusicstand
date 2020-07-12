@@ -64,6 +64,7 @@ $(function() {
             $('#query').select();
             $('#list-viewer').css('visibility', 'visible');
             $('#pdf-viewer').css('visibility', 'hidden');
+            $('#pdf-viewer').css('display', 'none');
             perform_query();
             // this.select_entry(0);
         }
@@ -73,6 +74,7 @@ $(function() {
             $('#query').blur();
             $('#query').blur();
             $('#pdf-viewer').css('visibility', 'visible');
+            $('#pdf-viewer').css('display', 'block');
             $('#list-viewer').css('visibility', 'hidden');
         }
 
