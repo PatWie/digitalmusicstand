@@ -348,7 +348,19 @@ $(function() {
         load: function() {
             var self = this;
             $.getJSON("/sheets.json", function(data) {
-                self.data = data;
+
+                // Add latent fields to support queries like "sonatelem" and "telemsona" to
+                // match "Sonata Telemann".
+                var data_enhanced = data.map(function(el) {
+                  var o = Object.assign({}, el);
+                  o.title_artist = el.title+" "+el.artist;
+                  o.artist_title = el.artist+" "+el.title;
+                  return o;
+                })
+
+                // console.log(data_enhanced)
+
+                self.data = data_enhanced;
                 $("#num_sheets").text(data.length + ' Sheets');
                 $("#status_num_sheets").text(data.length + ' Sheets');
             });
@@ -395,6 +407,7 @@ $(function() {
             $.each(items, function(index, value) {
                 let title = value.obj.title;
                 let artist = value.obj.artist;
+                // TODO(patwie): Fix the issue with the highlight of latent fields.
                 let title_highlight = fuzzysort.highlight(value[0]) || value.obj.title;
                 let artist_highlight = fuzzysort.highlight(value[1]) || value.obj.artist;
                 let url = value.obj.url;
@@ -425,7 +438,7 @@ $(function() {
 
                     this.old_q = q;
                     self.found_items = fuzzysort.go(q.trim(), self.data, {
-                        keys: ['title', 'artist'],
+                        keys: ['title', 'artist', 'title_artist', 'artist_title'],
                         allowTypo: true
                     })
                     self.item_idx = -1
