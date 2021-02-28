@@ -1,2 +1,2 @@
 all:
-		sudo docker build -t patwie/dms-release:latest -f dms-release.dockerfile .
+		docker build -t patwie/dms-release:pkger -f dms-release.dockerfile .

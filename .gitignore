@@ -2,7 +2,7 @@ sheets/*
 !sheets/.keep
 /digitalmusicstand
 *-packr.go
-
+pkged.go
 static.min/
 digitalmusicstand-*
 *.tar.gz

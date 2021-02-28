@@ -4,17 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 
 	"github.com/akamensky/argparse"
-	"github.com/go-chi/chi"
-	"github.com/gobuffalo/packr/v2"
+	"github.com/go-chi/chi/v5"
+	"github.com/markbates/pkger"
 )
-
-var box *packr.Box
 
 func FileServer(r chi.Router, path string, root http.FileSystem) {
 	if strings.ContainsAny(path, "{}*") {
@@ -34,8 +33,16 @@ func FileServer(r chi.Router, path string, root http.FileSystem) {
 	}))
 }
 
+func ReadStringFromFile(path string) string {
+	packagedFile, _ := pkger.Open(path)
+	html_buf, err := ioutil.ReadAll(packagedFile)
+	if err != nil{
+		panic(err)
+	}
+	return string(html_buf)
+}
+
 func main() {
-	box = packr.New("myBox", "./static.min")
 
 	parser := argparse.NewParser("dm", "Digital Music Stand (https://github.com/PatWie/digitalmusicstand)")
 	sheetDir := parser.String("s", "sheets", &argparse.Options{Required: false, Help: "Path to sheets", Default: "sheets"})
@@ -47,7 +54,7 @@ func main() {
 		log.Fatal(parser.Usage(err))
 	}
 
-	html, err := box.FindString("index.html")
+	html := ReadStringFromFile("/static.min/index.html")
 
 	r := chi.NewRouter()
 
@@ -83,8 +90,8 @@ func main() {
 
 	})
 
-	FileServer(r, "/", box)
 	FileServer(r, "/sheet", http.Dir(*sheetDir))
+	FileServer(r, "/", pkger.Dir("/static.min"))
 
 	fmt.Println("Digital Music Stand (https://github.com/PatWie/digitalmusicstand)")
 	fmt.Println("listens at            ", *addr)
