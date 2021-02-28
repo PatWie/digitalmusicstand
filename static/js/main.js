@@ -238,20 +238,41 @@ $(function() {
 
             let render_page = function(self, page_number, canvas) {
                 self.pdfDocument.getPage(page_number).then(function(page) {
-                    const scale = self.pdfViewer.offsetHeight / page.getViewport({
+                    // We fake a larger viewport to render it several times bigger.
+                    const requested_scale = self.pdfViewer.offsetHeight / page.getViewport({
                         scale: 1.0,
                     }).height;
+
+                    // For smaller viewports, we need to bump up the factor for pdfjs.
+                    var factor = 0.03125;
+                    if(requested_scale > 1){
+                        // In this case, the viewport size is larger than needed. But
+                        // a factor 4 also improves the quality.
+                        var factor = 0.25;
+                    }
+                    const scale = self.pdfViewer.offsetHeight / page.getViewport({
+                        scale: factor,
+                    }).height;
+
 
                     viewport = page.getViewport({
                         scale: scale,
                     });
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
+                    var ctx = canvas.getContext('2d');
+                    canvas.height = factor*viewport.height;
+                    canvas.width = factor*viewport.width;
+                    ctx.fillStyle = "white";
+                    ctx.fillRect(0, 0, viewport.width, viewport.height);
+
+
                     page.render({
                         canvasContext: canvas.getContext('2d'),
                         viewport: viewport
                     });
                     self.page_width = canvas.width;
+                    // Now we, undo the larger viewport by down-scaling using the canvas.
+                    ctx.scale(factor*window.devicePixelRatio, factor*window.devicePixelRatio);
+
                 });
             };
 
