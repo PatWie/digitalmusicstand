@@ -424,7 +424,7 @@ $(function() {
 
 
                     this.old_q = q;
-                    self.found_items = fuzzysort.go(q, self.data, {
+                    self.found_items = fuzzysort.go(q.trim(), self.data, {
                         keys: ['title', 'artist'],
                         allowTypo: true
                     })
