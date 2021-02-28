@@ -238,18 +238,8 @@ $(function() {
 
             let render_page = function(self, page_number, canvas) {
                 self.pdfDocument.getPage(page_number).then(function(page) {
-                    // We fake a larger viewport to render it several times bigger.
-                    const requested_scale = self.pdfViewer.offsetHeight / page.getViewport({
-                        scale: 1.0,
-                    }).height;
-
                     // For smaller viewports, we need to bump up the factor for pdfjs.
-                    var factor = 0.03125;
-                    if(requested_scale > 1){
-                        // In this case, the viewport size is larger than needed. But
-                        // a factor 4 also improves the quality.
-                        var factor = 0.25;
-                    }
+                    var factor = 1/32.0;
                     const scale = self.pdfViewer.offsetHeight / page.getViewport({
                         scale: factor,
                     }).height;
