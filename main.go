@@ -36,19 +36,17 @@ func FileServer(r chi.Router, path string, root http.FileSystem) {
 func ReadStringFromFile(path string) string {
 	packagedFile, _ := pkger.Open(path)
 	html_buf, err := ioutil.ReadAll(packagedFile)
-	if err != nil{
+	if err != nil {
 		panic(err)
 	}
 	return string(html_buf)
 }
 
 func main() {
-
 	parser := argparse.NewParser("dm", "Digital Music Stand (https://github.com/PatWie/digitalmusicstand)")
 	sheetDir := parser.String("s", "sheets", &argparse.Options{Required: false, Help: "Path to sheets", Default: "sheets"})
 	addr := parser.String("l", "listen", &argparse.Options{Required: false, Help: "Listen at", Default: ":3000"})
 	allowUploads := parser.Flag("u", "allow-uploads", &argparse.Options{Required: false, Help: "Allow Uploads", Default: false})
-	parsePdf := parser.Flag("p", "parse-pdf", &argparse.Options{Required: false, Help: "Parse PDF Files", Default: false})
 	parseYaml := parser.Flag("y", "parse-yaml", &argparse.Options{Required: false, Help: "Parse Yaml Files", Default: false})
 
 	err := parser.Parse(os.Args)
@@ -61,13 +59,13 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Get("/sheets.json", func(w http.ResponseWriter, r *http.Request) {
-		sheets, err := GetSheets(*sheetDir, *parsePdf, *parseYaml)
+		sheets, err := GetSheets(*sheetDir, *parseYaml)
 		if err != nil {
 			log.Fatal(parser.Usage(err))
 		}
 		json.NewEncoder(w).Encode(sheets)
-
 	})
+
 	if *allowUploads {
 		r.Post("/upload", UploadSheet(*sheetDir))
 		html = strings.Replace(html, "data-upload=disabled", "data-upload=enabled", 1)
@@ -77,7 +75,6 @@ func main() {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("400 - Uploads are not enabled!"))
 			return
-
 		})
 	}
 

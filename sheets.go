@@ -79,9 +79,9 @@ func UploadSheet(sheetDir string) func(http.ResponseWriter, *http.Request) {
 
 }
 
-func GetSheets(sheetDir string, parsePdf bool, parseYaml bool) ([]Sheet, error) {
+func GetSheets(sheetDir string, parseYaml bool) ([]Sheet, error) {
 	sheets := []Sheet{}
-	//processed_pdfs := []string{}
+	processed_pdfs := []string{}
 
 	// process yaml files
 	if parseYaml {
@@ -108,6 +108,7 @@ func GetSheets(sheetDir string, parsePdf bool, parseYaml bool) ([]Sheet, error) 
 			}
 
 			url := "/sheet/" + url.QueryEscape(sheetConfig.BookPath)
+			processed_pdfs = append(processed_pdfs, sheetConfig.BookPath)
 
 			if len(sheetConfig.Songs) > 0 {
 				for _, song := range sheetConfig.Songs {
@@ -125,28 +126,39 @@ func GetSheets(sheetDir string, parsePdf bool, parseYaml bool) ([]Sheet, error) 
 	}
 
 	// process pdf files
-	if parsePdf {
-		pattern := sheetDir + "/*_*.pdf"
-		matches, err := filepath.Glob(pattern)
+	pattern := sheetDir + "/*_*.pdf"
+	matches, err := filepath.Glob(pattern)
 
-		if err != nil {
-			return nil, err
+	if err != nil {
+		return nil, err
+	}
+
+	for _, match := range matches {
+		match = strings.ReplaceAll(match, (sheetDir)+"/", "")
+
+		// skip already processed files
+		skip := false
+		for _, file := range processed_pdfs {
+			if file == match {
+				skip = true
+				break
+			}
 		}
 
-		for _, match := range matches {
-			match = strings.ReplaceAll(match, (sheetDir)+"/", "")
+		if skip {
+			continue
+		}
 
-			url := "/sheet/" + url.QueryEscape(match)
-			match = strings.ReplaceAll(match, ".pdf", "")
-			match = strings.ReplaceAll(match, "-", " ")
+		url := "/sheet/" + url.QueryEscape(match)
+		match = strings.ReplaceAll(match, ".pdf", "")
+		match = strings.ReplaceAll(match, "-", " ")
 
-			tokens := strings.Split(match, "_")
-			if len(tokens) == 2 {
-				artist := strings.Title(strings.ToLower(tokens[0]))
-				title := strings.Title(strings.ToLower(tokens[1]))
+		tokens := strings.Split(match, "_")
+		if len(tokens) == 2 {
+			artist := strings.Title(strings.ToLower(tokens[0]))
+			title := strings.Title(strings.ToLower(tokens[1]))
 
-				sheets = append(sheets, Sheet{Title: title, Artist: artist, URL: url})
-			}
+			sheets = append(sheets, Sheet{Title: title, Artist: artist, URL: url})
 		}
 	}
 
