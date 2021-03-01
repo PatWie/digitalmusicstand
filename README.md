@@ -12,6 +12,8 @@ A simple cross-platform browser-based pdfjs-based viewer to display and search m
 * Shortcuts `1,2` to scroll to previous/next page using a programmable foot pedal.
 * Unobtrusive design
 * Upload PDF when enabled
+* Add sheets via simple file naming
+* Use a YAML format to add complex sheets and whole songbooks
 
 ## DEMO
 
@@ -60,6 +62,43 @@ cd digitalmusicstand
 
 The files in the sheet directoy need to follow the convention `interpret_title.pdf`.
 Whitespaces should be replaced by '-'.
+
+Alternatively, the YAML format can be used to describe complex sheets or songbooks.
+
+Example 1 (Songbook):
+```yaml
+# content of The_Big_Book_of_Jazz.yml
+path: The_Big_Book_of_Jazz.pdf
+artist: Various Artists
+title: The Big Book of Jazz
+songs:
+    - artist: Artist 1
+      title: Song 1
+      pages: [2, 3]
+    - artist: Artist 2
+      title: Song 2
+      pages: [4, 5, 6, 5, 6]
+    - title: The Big Book of Jazz (Full book)
+```
+
+Example 2 (single sheet):
+```yaml
+# content of Let_it_be.yml
+path: Let_it_be.pdf
+artist: The Beatles
+title: Let It Be
+```
+* Each song is added to the sheet list with its artist name and title. (see Example 1)
+* The page numbers define the used pages of the PDF and their ordering. (see Song 1 and Song 2)
+* If no page information for a song is provided, the complete pdf is used. (see Example 1)
+* If no artist name for a song is provided, the artist name of the head is used. (useful for single artist songbooks)
+* If no songs are provided, the head (artist anme and title) is used for a single sheet. (see Example 2)
+* Subfolders are allowed in `path`.
+
+To activate this functionality use the `--parse-yaml` flag:
+```bash
+./digitalmusicstand --parse-yaml --sheets /path/to/pdfs --listen :3000
+```
 
 Point your browser to `http://localhost:3000`
 
