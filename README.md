@@ -13,7 +13,7 @@ A simple cross-platform browser-based pdfjs-based viewer to display and search m
 * Unobtrusive design
 * Upload PDF when enabled
 * Add sheets via simple file naming
-* Use a YAML format to add complex sheets and whole songbooks
+* Use a YAML format to add whole songbooks and complex sheets
 
 ## DEMO
 
@@ -63,7 +63,11 @@ cd digitalmusicstand
 The files in the sheet directoy need to follow the convention `interpret_title.pdf`.
 Whitespaces should be replaced by '-'.
 
-Alternatively, the YAML format can be used to describe complex sheets or songbooks.
+Point your browser to `http://localhost:3000`
+
+#### Add Songbooks
+
+Alternatively, the YAML format can be used to add songbooks or complex sheets.
 
 Example 1 (Songbook):
 ```yaml
@@ -99,6 +103,3 @@ To activate this functionality use the `--parse-yaml` flag:
 ```bash
 ./digitalmusicstand --parse-yaml --sheets /path/to/pdfs --listen :3000
 ```
-
-Point your browser to `http://localhost:3000`
-
