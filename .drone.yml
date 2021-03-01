@@ -9,7 +9,7 @@ platform:
 
 steps:
 - name: minify_pack
-  image: patwie/dms-release:latest
+  image: patwie/dms-release:pkger
   commands:
   - rm -rf static.min
   - mkdir static.min
@@ -24,7 +24,7 @@ steps:
   - minify -o static.min/js/dropzone.min.js static/js/dropzone.js
   - "cp static/fonts/* static.min/fonts/"
   - cp static/favicon.ico static.min/favicon.ico
-  - /go/bin/packr2
+  - /go/bin/pkger
 
 - name: build-linux-amd64
   image: golang:1.13
@@ -93,6 +93,6 @@ steps:
 
 ---
 kind: signature
-hmac: e856be57aa7aaa40f0533cdce7a63a250ec5097ee15fe037227bc303daf94c3f
+hmac: ea5a1555cb3e30f312b5b71c48e36ffe1b2990e8c2445f7a2e3224423685e4a2
 
 ...

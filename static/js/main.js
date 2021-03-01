@@ -58,6 +58,7 @@ $(function() {
             $('#query').select();
             $('#list-viewer').css('visibility', 'visible');
             $('#pdf-viewer').css('visibility', 'hidden');
+            $('#pdf-viewer').css('display', 'none');
             perform_query();
             // this.select_entry(0);
         }
@@ -67,6 +68,7 @@ $(function() {
             $('#query').blur();
             $('#query').blur();
             $('#pdf-viewer').css('visibility', 'visible');
+            $('#pdf-viewer').css('display', 'block');
             $('#list-viewer').css('visibility', 'hidden');
         }
 
@@ -232,20 +234,31 @@ $(function() {
 
             let render_page = function(self, page_number, canvas) {
                 self.pdfDocument.getPage(page_number).then(function(page) {
+                    // For smaller viewports, we need to bump up the factor for pdfjs.
+                    var factor = 1/32.0;
                     const scale = self.pdfViewer.offsetHeight / page.getViewport({
-                        scale: 1.0,
+                        scale: factor,
                     }).height;
+
 
                     viewport = page.getViewport({
                         scale: scale,
                     });
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
+                    var ctx = canvas.getContext('2d');
+                    canvas.height = factor*viewport.height;
+                    canvas.width = factor*viewport.width;
+                    ctx.fillStyle = "white";
+                    ctx.fillRect(0, 0, viewport.width, viewport.height);
+
+
                     page.render({
                         canvasContext: canvas.getContext('2d'),
                         viewport: viewport
                     });
                     self.page_width = canvas.width;
+                    // Now we, undo the larger viewport by down-scaling using the canvas.
+                    ctx.scale(factor*window.devicePixelRatio, factor*window.devicePixelRatio);
+
                 });
             };
 
@@ -332,7 +345,19 @@ $(function() {
         load: function() {
             var self = this;
             $.getJSON("/sheets.json", function(data) {
-                self.data = data;
+
+                // Add latent fields to support queries like "sonatelem" and "telemsona" to
+                // match "Sonata Telemann".
+                var data_enhanced = data.map(function(el) {
+                  var o = Object.assign({}, el);
+                  o.title_artist = el.title+" "+el.artist;
+                  o.artist_title = el.artist+" "+el.title;
+                  return o;
+                })
+
+                // console.log(data_enhanced)
+
+                self.data = data_enhanced;
                 $("#num_sheets").text(data.length + ' Sheets');
                 $("#status_num_sheets").text(data.length + ' Sheets');
             });
@@ -378,6 +403,7 @@ $(function() {
             $.each(items, function(index, value) {
                 let title = value.obj.title;
                 let artist = value.obj.artist;
+                // TODO(patwie): Fix the issue with the highlight of latent fields.
                 let title_highlight = fuzzysort.highlight(value[0]) || value.obj.title;
                 let artist_highlight = fuzzysort.highlight(value[1]) || value.obj.artist;
                 let url = value.obj.url;
@@ -410,8 +436,8 @@ $(function() {
             if (q.length > 0) {
                 if (q != this.old_q) {
                     this.old_q = q;
-                    self.found_items = fuzzysort.go(q, self.data, {
-                        keys: ['title', 'artist'],
+                    self.found_items = fuzzysort.go(q.trim(), self.data, {
+                        keys: ['title', 'artist', 'title_artist', 'artist_title'],
                         allowTypo: true
                     })
                     self.item_idx = -1

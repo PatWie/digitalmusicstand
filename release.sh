@@ -14,5 +14,5 @@ minify -o static.min/js/pdf.min.js static/js/pdf.js static/js/pdf.worker.js
 minify -o static.min/js/main.min.js static/js/fuzzysort.js static/js/main.js
 cp static/fonts/* static.min/fonts/
 cp static/favicon.ico static.min/favicon.ico
-~/go/bin/packr2
+~/go/bin/pkger
 go build
