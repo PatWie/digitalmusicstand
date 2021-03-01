@@ -97,7 +97,6 @@ func GetSheets(sheetDir string, parsePdf bool, parseYaml bool) ([]Sheet, error) 
 
 			if err != nil {
 				return nil, err
-				continue
 			}
 
 			sheetConfig := SheetConfig{}
@@ -106,13 +105,16 @@ func GetSheets(sheetDir string, parsePdf bool, parseYaml bool) ([]Sheet, error) 
 
 			if err != nil {
 				return nil, err
-				continue
 			}
 
 			url := "/sheet/" + url.QueryEscape(sheetConfig.BookPath)
 
 			if len(sheetConfig.Songs) > 0 {
 				for _, song := range sheetConfig.Songs {
+					if song.Artist == "" {
+						song.Artist = sheetConfig.BookArtist
+					}
+
 					sheets = append(sheets, Sheet{Title: song.Title, Artist: song.Artist, URL: url, Pages: song.Pages,
 						BookArtist: sheetConfig.BookArtist, BookTitle: sheetConfig.BookTitle})
 				}
