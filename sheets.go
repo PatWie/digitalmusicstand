@@ -2,18 +2,35 @@ package main
 
 import (
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 )
 
 type Sheet struct {
-	Title  string `json:"title"`
-	Artist string `json:"artist"`
-	URL    string `json:"url"`
+	Title      string `json:"title"`
+	Artist     string `json:"artist"`
+	BookArtist string `json:"bookartist"`
+	BookTitle  string `json:"booktitle"`
+	URL        string `json:"url"`
+	Pages      []int  `json:"pages"`
+}
+
+type SheetConfig struct {
+	BookPath   string `yaml:"path"`
+	BookArtist string `yaml:"artist"`
+	BookTitle  string `yaml:"title"`
+	Songs      []struct {
+		Artist string `yaml:"artist"`
+		Title  string `yaml:"title"`
+		Pages  []int  `yaml:",flow"`
+	}
 }
 
 func UploadSheet(sheetDir string) func(http.ResponseWriter, *http.Request) {
@@ -62,9 +79,53 @@ func UploadSheet(sheetDir string) func(http.ResponseWriter, *http.Request) {
 
 }
 
-func GetSheets(sheetDir string) ([]Sheet, error) {
+func GetSheets(sheetDir string, parseYaml bool) ([]Sheet, error) {
 	sheets := []Sheet{}
+	processed_pdfs := []string{}
 
+	// process yaml files
+	if parseYaml {
+		pattern := sheetDir + "/*.yml"
+		matches, err := filepath.Glob(pattern)
+
+		if err != nil {
+			return nil, err
+		}
+
+		for _, match := range matches {
+			yamlFile, err := ioutil.ReadFile(match)
+
+			if err != nil {
+				return nil, err
+			}
+
+			sheetConfig := SheetConfig{}
+
+			err = yaml.Unmarshal(yamlFile, &sheetConfig)
+
+			if err != nil {
+				return nil, err
+			}
+
+			url := "/sheet/" + url.QueryEscape(sheetConfig.BookPath)
+			processed_pdfs = append(processed_pdfs, sheetConfig.BookPath)
+
+			if len(sheetConfig.Songs) > 0 {
+				for _, song := range sheetConfig.Songs {
+					if song.Artist == "" {
+						song.Artist = sheetConfig.BookArtist
+					}
+
+					sheets = append(sheets, Sheet{Title: song.Title, Artist: song.Artist, URL: url, Pages: song.Pages,
+						BookArtist: sheetConfig.BookArtist, BookTitle: sheetConfig.BookTitle})
+				}
+			} else {
+				sheets = append(sheets, Sheet{Title: sheetConfig.BookTitle, Artist: sheetConfig.BookArtist, URL: url})
+			}
+		}
+	}
+
+	// process pdf files
 	pattern := sheetDir + "/*_*.pdf"
 	matches, err := filepath.Glob(pattern)
 
@@ -74,6 +135,20 @@ func GetSheets(sheetDir string) ([]Sheet, error) {
 
 	for _, match := range matches {
 		match = strings.ReplaceAll(match, (sheetDir)+"/", "")
+
+		// skip already processed files
+		skip := false
+		for _, file := range processed_pdfs {
+			if file == match {
+				skip = true
+				break
+			}
+		}
+
+		if skip {
+			continue
+		}
+
 		url := "/sheet/" + url.QueryEscape(match)
 		match = strings.ReplaceAll(match, ".pdf", "")
 		match = strings.ReplaceAll(match, "-", " ")

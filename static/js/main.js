@@ -1,15 +1,12 @@
 'use strict';
 
 $(function() {
-
     var myDropzone = new Dropzone("#upload-dialog", {
         url: "/upload",
         previewTemplate: document.querySelector('#dropzone-template').innerHTML
     });
 
-
     class Dialog {
-
         constructor(element) {
             this.element = element;
             this.visibility = false;
@@ -43,7 +40,6 @@ $(function() {
             this.element.css('visibility', 'hidden');
             this.close_implementation();
         }
-
     }
 
     function perform_query() {
@@ -52,8 +48,6 @@ $(function() {
     }
 
     class PromptDialog extends Dialog {
-
-
         init(element) {
             $("#query").keyup(perform_query);
         }
@@ -124,7 +118,6 @@ $(function() {
             this.shortcuts.push(shortcut);
         }
 
-
         show(idx) {
             this.active_idx = idx;
             this.active_dialog().show();
@@ -135,18 +128,14 @@ $(function() {
             for (var i = this.shortcuts.length - 1; i >= 0; i--) {
                 if (e.key == this.shortcuts[i]) {
                     this.show(i);
-
                 }
             }
-
         }
     }
 
-
-
-
     var SheetApp = {
         pdfUrl: null,
+        pdfPages: null,
         pdfDocument: null,
         pdfViewer: null,
         pdfLoadingTask: null,
@@ -161,8 +150,15 @@ $(function() {
             let container = $("body");
             let target_canvas = $("canvas").eq(page_number);
             const skip = self.page_width + 2;
-            if (self.pdfDocument !== null && self.pdfDocument.numPages > 0 && target_canvas !== undefined) {
-                if ((page_number >= 0) && (page_number < self.pdfDocument.numPages)) {
+
+            let max_page_number = self.pdfDocument.numPages;
+
+            if (self.pdfPages) {
+                max_page_number = self.pdfPages.split(',').length;
+            }
+
+            if (self.pdfDocument !== null && max_page_number > 0 && target_canvas !== undefined) {
+                if ((page_number >= 0) && (page_number < max_page_number)) {
                     self.current_page_number = page_number;
                     container.animate({
                         scrollLeft: container.position().left + page_number * skip
@@ -185,22 +181,22 @@ $(function() {
             this.pdfLoadingTask = null;
             if (this.pdfDocument) {
                 this.pdfDocument = null;
-
             }
             return promise;
         },
-
 
         on_key_up: function(e) {
             if (e.which == 37 || e.which == 49) {
                 e.preventDefault();
                 this.scroll_to_page(this.current_page_number - 1);
             }
+
             if (e.which == 39 || e.which == 50) {
                 e.preventDefault();
                 this.scroll_to_page(this.current_page_number + 1);
             }
         },
+
         loading_finished: function() {
             $('#spinner').removeClass('spinner');
         },
@@ -218,8 +214,8 @@ $(function() {
             var self = this;
 
             self.pdfUrl = params.url;
+            self.pdfPages = params.pages;
             self.pdfDocument = null;
-
 
             // Loading document.
             var loadingTask = pdfjsLib.getDocument({
@@ -266,20 +262,23 @@ $(function() {
                 });
             };
 
-
             $('canvas').remove();
+
             return loadingTask.promise.then(function(pdfDocument) {
-
-
-
                     self.pdfDocument = pdfDocument;
                     self.pdfViewer = document.getElementById('pdf-viewer');
 
-                    for (page_number = 1; page_number <= pdfDocument.numPages; page_number++) {
+                    let page_numbers = Array.from(Array(pdfDocument.numPages), (_, i) => i + 1)
+
+                    if (self.pdfPages) {
+                        page_numbers = self.pdfPages.split(',');
+                    }
+
+                    for (i in page_numbers) {
                         canvas = document.createElement("canvas");
                         canvas.className = 'pdf-page-canvas';
                         self.pdfViewer.appendChild(canvas);
-                        render_page(self, page_number, canvas);
+                        render_page(self, parseInt(page_numbers[i]), canvas);
                     }
 
                     self.loading_finished();
@@ -296,7 +295,6 @@ $(function() {
                 self.loading_finished();
             });
         },
-
     };
 
     $("#right_btn").click(function(e) {
@@ -313,7 +311,6 @@ $(function() {
         e.stopPropagation();
         Results.load();
     });
-
 
     $("#search_btn").click(function(e) {
         if (dialogs.active_dialog() === undefined) {
@@ -384,7 +381,6 @@ $(function() {
             $("li[class='active']").removeClass('active');
             $("li").eq(this.item_idx).addClass("active");
 
-
             var current_offset = $("li[class='active']").offset();
             if (current_offset !== undefined) {
                 $("ul").scrollTop(
@@ -397,8 +393,8 @@ $(function() {
                 url: a.data('url'),
                 artist: a.data('artist'),
                 title: a.data('title'),
+                pages: a.data('pages'),
             }
-
         },
 
         draw_list: function(items) {
@@ -411,7 +407,10 @@ $(function() {
                 let title_highlight = fuzzysort.highlight(value[0]) || value.obj.title;
                 let artist_highlight = fuzzysort.highlight(value[1]) || value.obj.artist;
                 let url = value.obj.url;
-                $("#list-viewer ul").append('<li data-url="' + url + '"  data-title="' + title + '"  data-artist="' + artist + '">' + title_highlight + '<small>' + artist_highlight + '</small></li>');
+                let pages = value.obj.pages;
+
+                $("#list-viewer ul").append('<li data-url="' + url + '"  data-title="' + title + '"  data-artist="' + artist + '" data-pages="' + pages + '">' + title_highlight + '<small>' + artist_highlight + '</small></li>');
+
             });
 
             $('li').click(function(e) {
@@ -419,23 +418,23 @@ $(function() {
                     url: $(this).data('url'),
                     artist: $(this).data('artist'),
                     title: $(this).data('title'),
+                    pages: $(this).data('pages'),
                 }
+
                 SheetApp.open(params);
             });
         },
 
         build_list: function(q) {
             var self = this;
-
             var select_first_entry = false;
+
             if (self.found_items.length === 0) {
                 select_first_entry = true
             }
 
             if (q.length > 0) {
                 if (q != this.old_q) {
-
-
                     this.old_q = q;
                     self.found_items = fuzzysort.go(q.trim(), self.data, {
                         keys: ['title', 'artist', 'title_artist', 'artist_title'],
@@ -445,9 +444,7 @@ $(function() {
 
                     this.draw_list(self.found_items);
                     select_first_entry = true
-
                 }
-
             } else {
                 // show default 10 entries
                 var self = this;
@@ -459,20 +456,20 @@ $(function() {
                     // if (index > max_display_items) {
                     //     return false;
                     // }
+
                     self.found_items.push({
                         obj: {
                             title: value.title,
                             artist: value.artist,
-                            url: value.url
-
-
+                            url: value.url,
+                            pages: value.pages,
                         },
                         0: null,
                         1: null,
                     })
                 });
-                this.draw_list(self.found_items);
 
+                this.draw_list(self.found_items);
             }
 
             if (select_first_entry) {
@@ -486,13 +483,13 @@ $(function() {
     dialogs = new Dialogs();
     dialogs.push(new PromptDialog($('#prompt-dialog')), 'p');
     dialogs.push(new Dialog($('#help-dialog')), 'h');
+
     if ($("body").data('upload') == "enabled") {
         $("#upload-dialog_btn").css('visibility', 'visible');
         dialogs.push(new UploadDialog($('#upload-dialog')), 'u');
     } else {
         $("#upload-dialog_btn").css('visibility', 'hidden');
     }
-
 
     $(document).on('keyup', function(e) {
         let active_dialog = dialogs.active_dialog();
@@ -512,7 +509,6 @@ $(function() {
         }
     })
 
-
     $('html').click(function() {
         let active_dialog = dialogs.active_dialog();
         if (active_dialog !== undefined) {
@@ -520,6 +516,4 @@ $(function() {
             dialogs.active_idx = -1;
         }
     });
-
-
 });
