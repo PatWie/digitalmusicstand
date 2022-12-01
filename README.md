@@ -54,6 +54,8 @@ cd digitalmusicstand
 ./release.sh
 ```
 
+Instructions to install the required dependencies and their known-to-be-working versions are available at https://github.com/PatWie/digitalmusicstand/blob/master/.docker/dms-release.dockerfile
+
 ## Usage
 
 ```bash
