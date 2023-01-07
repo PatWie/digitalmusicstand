@@ -18,22 +18,6 @@ import (
 //go:embed static.min/*
 var embededFiles embed.FS
 
-func getAllFilenames(efs fs.FS) (files []string, err error) {
-	if err := fs.WalkDir(efs, ".", func(path string, d fs.DirEntry, err error) error {
-		if d.IsDir() {
-			return nil
-		}
-
-		files = append(files, path)
-
-		return nil
-	}); err != nil {
-		return nil, err
-	}
-
-	return files, nil
-}
-
 func FileServer(r chi.Router, path string, root http.FileSystem) {
 	if strings.ContainsAny(path, "{}*") {
 		panic("FileServer does not permit URL parameters.")
@@ -41,7 +25,7 @@ func FileServer(r chi.Router, path string, root http.FileSystem) {
 
 	fs := http.StripPrefix(path, http.FileServer(root))
 	if path != "/" && path[len(path)-1] != '/' {
-		r.Get(path, http.RedirectHandler(path+"/", 301).ServeHTTP)
+		r.Get(path, http.RedirectHandler(path+"/", http.StatusMovedPermanently).ServeHTTP)
 		path += "/"
 	}
 	path += "*"
@@ -59,6 +43,9 @@ func ReadStringFromFile(path string) string {
 	}
 
 	html_buf, err := fs.ReadFile(fsys, path)
+	if err != nil {
+		panic(err)
+	}
 
 	return string(html_buf)
 }
@@ -83,12 +70,15 @@ func main() {
 
 	r := chi.NewRouter()
 
-	r.Get("/sheets.json", func(w http.ResponseWriter, r *http.Request) {
+	r.Get("/sheets.json", func(w http.ResponseWriter, _ *http.Request) {
 		sheets, err := GetSheets(*sheetDir, *parseYaml)
 		if err != nil {
 			log.Fatal(parser.Usage(err))
 		}
-		json.NewEncoder(w).Encode(sheets)
+		err = json.NewEncoder(w).Encode(sheets)
+		if err != nil {
+			panic(err)
+		}
 	})
 
 	if *allowUploads {
@@ -96,10 +86,9 @@ func main() {
 		indexHTML = strings.Replace(indexHTML, "data-upload=disabled", "data-upload=enabled", 1)
 
 	} else {
-		r.Post("/upload", func(w http.ResponseWriter, r *http.Request) {
+		r.Post("/upload", func(w http.ResponseWriter, _ *http.Request) {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("400 - Uploads are not enabled!"))
-			return
 		})
 	}
 
@@ -108,9 +97,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		t.Execute(w, nil)
+	r.Get("/", func(w http.ResponseWriter, _ *http.Request) {
+		err := t.Execute(w, nil)
+		if err != nil {
+			panic(err)
+		}
 
 	})
 

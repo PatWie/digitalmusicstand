@@ -7,3 +7,5 @@ static.min/
 digitalmusicstand-*
 *.tar.gz
 *.zip
+
+dist/
