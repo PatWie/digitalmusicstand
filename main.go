@@ -1,10 +1,11 @@
 package main
 
 import (
+	"embed"
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"io/ioutil"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -12,8 +13,26 @@ import (
 
 	"github.com/akamensky/argparse"
 	"github.com/go-chi/chi/v5"
-	"github.com/markbates/pkger"
 )
+
+//go:embed static.min/*
+var embededFiles embed.FS
+
+func getAllFilenames(efs fs.FS) (files []string, err error) {
+	if err := fs.WalkDir(efs, ".", func(path string, d fs.DirEntry, err error) error {
+		if d.IsDir() {
+			return nil
+		}
+
+		files = append(files, path)
+
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+
+	return files, nil
+}
 
 func FileServer(r chi.Router, path string, root http.FileSystem) {
 	if strings.ContainsAny(path, "{}*") {
@@ -21,7 +40,6 @@ func FileServer(r chi.Router, path string, root http.FileSystem) {
 	}
 
 	fs := http.StripPrefix(path, http.FileServer(root))
-
 	if path != "/" && path[len(path)-1] != '/' {
 		r.Get(path, http.RedirectHandler(path+"/", 301).ServeHTTP)
 		path += "/"
@@ -34,11 +52,14 @@ func FileServer(r chi.Router, path string, root http.FileSystem) {
 }
 
 func ReadStringFromFile(path string) string {
-	packagedFile, _ := pkger.Open(path)
-	html_buf, err := ioutil.ReadAll(packagedFile)
+	fmt.Println(path)
+	fsys, err := fs.Sub(embededFiles, "static.min")
 	if err != nil {
 		panic(err)
 	}
+
+	html_buf, err := fs.ReadFile(fsys, path)
+
 	return string(html_buf)
 }
 
@@ -54,7 +75,11 @@ func main() {
 		log.Fatal(parser.Usage(err))
 	}
 
-	html := ReadStringFromFile("/static.min/index.html")
+	staticFilesFS, err := fs.Sub(embededFiles, "static.min")
+	if err != nil {
+		panic(err)
+	}
+	indexHTML := ReadStringFromFile("index.html")
 
 	r := chi.NewRouter()
 
@@ -68,7 +93,7 @@ func main() {
 
 	if *allowUploads {
 		r.Post("/upload", UploadSheet(*sheetDir))
-		html = strings.Replace(html, "data-upload=disabled", "data-upload=enabled", 1)
+		indexHTML = strings.Replace(indexHTML, "data-upload=disabled", "data-upload=enabled", 1)
 
 	} else {
 		r.Post("/upload", func(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +104,7 @@ func main() {
 	}
 
 	t := template.New("index")
-	t, err = t.Parse(html)
+	t, err = t.Parse(indexHTML)
 	if err != nil {
 		panic(err)
 	}
@@ -90,7 +115,7 @@ func main() {
 	})
 
 	FileServer(r, "/sheet", http.Dir(*sheetDir))
-	FileServer(r, "/", pkger.Dir("/static.min"))
+	FileServer(r, "/", http.FS(staticFilesFS))
 
 	fmt.Println("Digital Music Stand (https://github.com/PatWie/digitalmusicstand)")
 	fmt.Println("listens at            ", *addr)
