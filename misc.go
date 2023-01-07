@@ -58,7 +58,11 @@ func CompressPDFinDir(dirname string) error {
 
 		if _, err := os.Stat(target); os.IsNotExist(err) {
 			fmt.Println("Compress", match, target)
-			CompressPDF(match, target)
+			err = CompressPDF(match, target)
+			if err != nil {
+				panic(err)
+			}
+
 		}
 
 	}

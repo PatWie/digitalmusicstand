@@ -51,7 +51,14 @@ Or build it yourself:
 ```bash
 git clone https://github.com/PatWie/digitalmusicstand.git
 cd digitalmusicstand
-./release.sh
+
+# only run once: minify static assets
+wget https://github.com/tdewolff/minify/releases/download/v2.6.1/minify_2.6.1_linux_amd64.tar.gz
+tar -xvf minify_2.6.1_linux_amd64.tar.gz && rm -r cmd && rm LICENSE.md
+make
+
+# run multiple times
+go build
 ```
 
 Instructions to install the required dependencies and their known-to-be-working versions are available at https://github.com/PatWie/digitalmusicstand/blob/master/.docker/dms-release.dockerfile

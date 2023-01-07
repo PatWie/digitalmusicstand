@@ -2,7 +2,6 @@ package main
 
 import (
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -10,6 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"gopkg.in/yaml.v2"
 )
 
@@ -36,7 +37,11 @@ type SheetConfig struct {
 func UploadSheet(sheetDir string) func(http.ResponseWriter, *http.Request) {
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		r.ParseMultipartForm(32 << 20)
+		err := r.ParseMultipartForm(32 << 20)
+		if err != nil {
+			panic(err)
+		}
+
 		clientFile, handler, err := r.FormFile("file")
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -93,7 +98,7 @@ func GetSheets(sheetDir string, parseYaml bool) ([]Sheet, error) {
 		}
 
 		for _, match := range matches {
-			yamlFile, err := ioutil.ReadFile(match)
+			yamlFile, err := os.ReadFile(match)
 
 			if err != nil {
 				return nil, err
@@ -154,10 +159,10 @@ func GetSheets(sheetDir string, parseYaml bool) ([]Sheet, error) {
 		match = strings.ReplaceAll(match, "-", " ")
 
 		tokens := strings.Split(match, "_")
+		caser := cases.Title(language.English, cases.NoLower)
 		if len(tokens) == 2 {
-			artist := strings.Title(strings.ToLower(tokens[0]))
-			title := strings.Title(strings.ToLower(tokens[1]))
-
+			artist := caser.String(strings.ToLower(tokens[0]))
+			title := caser.String(strings.ToLower(tokens[1]))
 			sheets = append(sheets, Sheet{Title: title, Artist: artist, URL: url})
 		}
 	}
